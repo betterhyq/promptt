@@ -2,7 +2,7 @@
 name = "promptt"
 version = "0.0.1"
 authors = ["YONGQI <betterhyq@qq.com>"]
-edition = "2024"
+edition = "2021"
 description = "A template for creating a crate package"
 readme = "README.md"
 homepage = "https://github.com/betterhyq/promptt"
@@ -14,3 +14,4 @@ categories = ["development-tools"]
 [dependencies]
 ansi-escapes = "0.2.0"
 colour = "2.1.0"
+regex = "1.10"
