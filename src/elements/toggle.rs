@@ -52,7 +52,11 @@ pub fn run_toggle<R: BufRead, W: Write>(
     let result_str: &str = if value { &opts.active } else { &opts.inactive };
     let done_symbol = style::symbol(true, false, false);
     let done_delim = style::delimiter(true);
-    writeln!(stdout, "\r{} {} {} {}", done_symbol, msg, done_delim, result_str)?;
+    writeln!(
+        stdout,
+        "\r{} {} {} {}",
+        done_symbol, msg, done_delim, result_str
+    )?;
     stdout.flush()?;
     Ok(value)
 }

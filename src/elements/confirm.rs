@@ -36,7 +36,11 @@ pub fn run_confirm<R: BufRead, W: Write>(
     let mut buf = Vec::with_capacity(opts.message.len() + 32);
     write_bold!(&mut buf, "{}", opts.message).ok();
     let msg = String::from_utf8_lossy(&buf).into_owned();
-    let hint = if opts.initial { &opts.yes_option } else { &opts.no_option };
+    let hint = if opts.initial {
+        &opts.yes_option
+    } else {
+        &opts.no_option
+    };
     let mut gray_buf = Vec::with_capacity(hint.len() + 16);
     write_gray!(&mut gray_buf, "{}", hint).ok();
     let hint_styled = String::from_utf8_lossy(&gray_buf).into_owned();
@@ -55,7 +59,11 @@ pub fn run_confirm<R: BufRead, W: Write>(
     let result_str: &str = if value { &opts.yes_msg } else { &opts.no_msg };
     let done_symbol = style::symbol(true, false, false);
     let done_delim = style::delimiter(true);
-    writeln!(stdout, "\r{} {} {} {}", done_symbol, msg, done_delim, result_str)?;
+    writeln!(
+        stdout,
+        "\r{} {} {} {}",
+        done_symbol, msg, done_delim, result_str
+    )?;
     stdout.flush()?;
     Ok(value)
 }
@@ -92,7 +100,10 @@ mod tests {
 
     #[test]
     fn run_confirm_y_yes() {
-        let opts = ConfirmPromptOptions { message: "Ok?".into(), ..Default::default() };
+        let opts = ConfirmPromptOptions {
+            message: "Ok?".into(),
+            ..Default::default()
+        };
         let mut stdin = Cursor::new(b"y\n");
         let mut stdout = Vec::new();
         assert_eq!(run_confirm(&opts, &mut stdin, &mut stdout).unwrap(), true);

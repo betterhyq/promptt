@@ -43,13 +43,16 @@ pub fn run_number<R: BufRead, W: Write>(
     let mut buf = Vec::with_capacity(opts.message.len() + 32);
     write_bold!(&mut buf, "{}", opts.message).ok();
     let msg = String::from_utf8_lossy(&buf).into_owned();
-    let initial_str = opts.initial.map(|n| {
-        if opts.float {
-            format!("{:.prec$}", n, prec = opts.round as usize)
-        } else {
-            format!("{}", n as i64)
-        }
-    }).unwrap_or_default();
+    let initial_str = opts
+        .initial
+        .map(|n| {
+            if opts.float {
+                format!("{:.prec$}", n, prec = opts.round as usize)
+            } else {
+                format!("{}", n as i64)
+            }
+        })
+        .unwrap_or_default();
     let symbol = style::symbol(false, false, false);
     let delim = style::delimiter(false);
     write!(stdout, "{} {} {} {}", symbol, msg, delim, initial_str)?;
@@ -61,9 +64,19 @@ pub fn run_number<R: BufRead, W: Write>(
         opts.initial.unwrap_or(0.0)
     } else {
         let v = if opts.float {
-            raw.parse::<f64>().map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, opts.error_msg.as_deref().unwrap_or("invalid number")))?
+            raw.parse::<f64>().map_err(|_| {
+                io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    opts.error_msg.as_deref().unwrap_or("invalid number"),
+                )
+            })?
         } else {
-            raw.parse::<i64>().map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, opts.error_msg.as_deref().unwrap_or("invalid number")))? as f64
+            raw.parse::<i64>().map_err(|_| {
+                io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    opts.error_msg.as_deref().unwrap_or("invalid number"),
+                )
+            })? as f64
         };
         let v = round_n(v, opts.round);
         let v = opts.min.map_or(v, |m| v.max(m));
@@ -76,7 +89,11 @@ pub fn run_number<R: BufRead, W: Write>(
     };
     let done_symbol = style::symbol(true, false, false);
     let done_delim = style::delimiter(true);
-    writeln!(stdout, "\r{} {} {} {}", done_symbol, msg, done_delim, displayed)?;
+    writeln!(
+        stdout,
+        "\r{} {} {} {}",
+        done_symbol, msg, done_delim, displayed
+    )?;
     stdout.flush()?;
     Ok(value)
 }

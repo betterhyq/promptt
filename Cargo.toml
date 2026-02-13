@@ -1,15 +1,15 @@
 [package]
 name = "promptt"
-version = "0.0.1"
+version = "1.0.0"
 authors = ["YONGQI <betterhyq@qq.com>"]
 edition = "2021"
-description = "A template for creating a crate package"
+description = "A interactive CLI prompts library, lightweight and easy to use."
 readme = "README.md"
 homepage = "https://github.com/betterhyq/promptt"
 repository = "https://github.com/betterhyq/promptt.git"
 license = "MIT"
-keywords = [""]
-categories = ["development-tools"]
+keywords = ["cli", "prompts", "interactive", "library"]
+categories = ["development-tools", "command-line-utilities"]
 
 [dependencies]
 ansi-escapes = "0.2.0"

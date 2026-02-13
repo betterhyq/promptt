@@ -7,8 +7,10 @@ static ANSI_RE: OnceLock<Regex> = OnceLock::new();
 
 fn ansi_re() -> &'static Regex {
     ANSI_RE.get_or_init(|| {
-        Regex::new(r"\x1B(?:\[[0-?]*[ -/]*[@-~]|\][0-9;]*\x07|\[[?0-9;]*[a-zA-Z])|\x9B[0-?]*[ -/]*[@-~]")
-            .unwrap()
+        Regex::new(
+            r"\x1B(?:\[[0-?]*[ -/]*[@-~]|\][0-9;]*\x07|\[[?0-9;]*[a-zA-Z])|\x9B[0-?]*[ -/]*[@-~]",
+        )
+        .unwrap()
     })
 }
 

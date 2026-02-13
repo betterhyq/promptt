@@ -45,7 +45,10 @@ pub fn run_select<R: BufRead, W: Write>(
     let msg = String::from_utf8_lossy(&buf).into_owned();
     let symbol = style::symbol(false, false, false);
     let delim = style::delimiter(false);
-    let hint = opts.hint.as_deref().unwrap_or("Use arrow-keys or type number. Return to submit.");
+    let hint = opts
+        .hint
+        .as_deref()
+        .unwrap_or("Use arrow-keys or type number. Return to submit.");
     let mut gray_buf = Vec::with_capacity(hint.len() + 16);
     write_gray!(&mut gray_buf, "{}", hint).ok();
     let hint_styled = String::from_utf8_lossy(&gray_buf).into_owned();
@@ -71,18 +74,28 @@ pub fn run_select<R: BufRead, W: Write>(
             None
         }
     } else {
-        opts.choices.iter().position(|c| {
-        c.title.eq_ignore_ascii_case(raw) || c.value.eq_ignore_ascii_case(raw)
-    })
+        opts.choices
+            .iter()
+            .position(|c| c.title.eq_ignore_ascii_case(raw) || c.value.eq_ignore_ascii_case(raw))
     };
     let idx = idx.or(opts.initial).unwrap_or(0);
-    let choice = opts.choices.get(idx).ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "invalid choice"))?;
+    let choice = opts
+        .choices
+        .get(idx)
+        .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "invalid choice"))?;
     if choice.disabled {
-        return Err(io::Error::new(io::ErrorKind::InvalidInput, "selected option is disabled"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "selected option is disabled",
+        ));
     }
     let done_symbol = style::symbol(true, false, false);
     let done_delim = style::delimiter(true);
-    writeln!(stdout, "\r{} {} {} {}", done_symbol, msg, done_delim, choice.title)?;
+    writeln!(
+        stdout,
+        "\r{} {} {} {}",
+        done_symbol, msg, done_delim, choice.title
+    )?;
     stdout.flush()?;
     Ok(choice.value.clone())
 }
@@ -124,7 +137,10 @@ mod tests {
     fn run_select_by_title_case_insensitive() {
         let opts = SelectPromptOptions {
             message: "Pick".into(),
-            choices: vec![Choice::new("Apple", "apple"), Choice::new("Banana", "banana")],
+            choices: vec![
+                Choice::new("Apple", "apple"),
+                Choice::new("Banana", "banana"),
+            ],
             initial: None,
             hint: None,
         };

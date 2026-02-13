@@ -8,8 +8,8 @@ pub use elements::{
     Choice, ConfirmPromptOptions, NumberPromptOptions, Prompt, SelectPromptOptions,
     TextPromptOptions, TogglePromptOptions,
 };
-pub use prompts::{run_prompt, PromptValue, Question};
-pub use util::{clear, key_action, lines_count, render_style, strip_ansi, Figures, InputStyle};
+pub use prompts::{PromptValue, Question, run_prompt};
+pub use util::{Figures, InputStyle, clear, key_action, lines_count, render_style, strip_ansi};
 
 use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
@@ -69,14 +69,12 @@ mod tests {
 
     #[test]
     fn prompt_skips_empty_type_name() {
-        let questions = vec![
-            Question {
-                name: "skip".into(),
-                type_name: String::new(),
-                message: "Skipped?".into(),
-                ..Default::default()
-            },
-        ];
+        let questions = vec![Question {
+            name: "skip".into(),
+            type_name: String::new(),
+            message: "Skipped?".into(),
+            ..Default::default()
+        }];
         let mut stdin = Cursor::new(b"");
         let mut stdout = Vec::new();
         let r = prompt(&questions, &mut stdin, &mut stdout);

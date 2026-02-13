@@ -323,7 +323,10 @@ mod tests {
             name: "choice".into(),
             type_name: "select".into(),
             message: "Pick".into(),
-            choices: Some(vec![Choice::new("Apple", "apple"), Choice::new("Banana", "banana")]),
+            choices: Some(vec![
+                Choice::new("Apple", "apple"),
+                Choice::new("Banana", "banana"),
+            ]),
             ..Default::default()
         };
         let mut stdin = Cursor::new(b"Apple\n");

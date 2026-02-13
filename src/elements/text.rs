@@ -43,11 +43,19 @@ pub fn run_text<R: BufRead, W: Write>(
     let mut line = String::new();
     stdin.read_line(&mut line)?;
     let value = line.trim().to_string();
-    let value = if value.is_empty() { initial.to_string() } else { value };
+    let value = if value.is_empty() {
+        initial.to_string()
+    } else {
+        value
+    };
     let rendered = transform.render(&value, opts.style);
     let done_symbol = style::symbol(true, false, false);
     let done_delim = style::delimiter(true);
-    writeln!(stdout, "\r{} {} {} {}", done_symbol, msg_styled, done_delim, rendered)?;
+    writeln!(
+        stdout,
+        "\r{} {} {} {}",
+        done_symbol, msg_styled, done_delim, rendered
+    )?;
     stdout.flush()?;
     Ok(value)
 }

@@ -1,7 +1,7 @@
 //! Clears prompt lines from terminal.
 
-use ansi_escapes::{CursorTo, EraseLine, EraseLines};
 use crate::util::strip::strip_ansi;
+use ansi_escapes::{CursorTo, EraseLine, EraseLines};
 
 fn width(s: &str) -> usize {
     strip_ansi(s).chars().count()

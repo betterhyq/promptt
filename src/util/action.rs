@@ -99,46 +99,164 @@ mod tests {
     use super::*;
 
     fn key_char(c: char) -> Key {
-        Key { name: KeyName::Char(c), ctrl: false, meta: false }
+        Key {
+            name: KeyName::Char(c),
+            ctrl: false,
+            meta: false,
+        }
     }
 
     fn key_ctrl(c: char) -> Key {
-        Key { name: KeyName::Char(c), ctrl: true, meta: false }
+        Key {
+            name: KeyName::Char(c),
+            ctrl: true,
+            meta: false,
+        }
     }
 
     #[test]
     fn return_submit() {
-        assert_eq!(key_action(&Key { name: KeyName::Return, ctrl: false, meta: false }, false), Some(PromptAction::Submit));
-        assert_eq!(key_action(&Key { name: KeyName::Enter, ctrl: false, meta: false }, false), Some(PromptAction::Submit));
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Return,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::Submit)
+        );
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Enter,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::Submit)
+        );
     }
 
     #[test]
     fn backspace_delete() {
-        assert_eq!(key_action(&Key { name: KeyName::Backspace, ctrl: false, meta: false }, false), Some(PromptAction::Delete));
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Backspace,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::Delete)
+        );
     }
 
     #[test]
     fn delete_forward() {
-        assert_eq!(key_action(&Key { name: KeyName::Delete, ctrl: false, meta: false }, false), Some(PromptAction::DeleteForward));
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Delete,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::DeleteForward)
+        );
     }
 
     #[test]
     fn escape_exit() {
-        assert_eq!(key_action(&Key { name: KeyName::Escape, ctrl: false, meta: false }, false), Some(PromptAction::Exit));
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Escape,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::Exit)
+        );
     }
 
     #[test]
     fn arrow_keys() {
-        assert_eq!(key_action(&Key { name: KeyName::Up, ctrl: false, meta: false }, false), Some(PromptAction::Up));
-        assert_eq!(key_action(&Key { name: KeyName::Down, ctrl: false, meta: false }, false), Some(PromptAction::Down));
-        assert_eq!(key_action(&Key { name: KeyName::Left, ctrl: false, meta: false }, false), Some(PromptAction::Left));
-        assert_eq!(key_action(&Key { name: KeyName::Right, ctrl: false, meta: false }, false), Some(PromptAction::Right));
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Up,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::Up)
+        );
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Down,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::Down)
+        );
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Left,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::Left)
+        );
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Right,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::Right)
+        );
     }
 
     #[test]
     fn home_end() {
-        assert_eq!(key_action(&Key { name: KeyName::Home, ctrl: false, meta: false }, false), Some(PromptAction::Home));
-        assert_eq!(key_action(&Key { name: KeyName::End, ctrl: false, meta: false }, false), Some(PromptAction::End));
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Home,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::Home)
+        );
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::End,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::End)
+        );
     }
 
     #[test]
@@ -185,12 +303,42 @@ mod tests {
 
     #[test]
     fn tab_next() {
-        assert_eq!(key_action(&Key { name: KeyName::Tab, ctrl: false, meta: false }, false), Some(PromptAction::Next));
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Tab,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::Next)
+        );
     }
 
     #[test]
     fn page_up_down() {
-        assert_eq!(key_action(&Key { name: KeyName::PageUp, ctrl: false, meta: false }, false), Some(PromptAction::PrevPage));
-        assert_eq!(key_action(&Key { name: KeyName::PageDown, ctrl: false, meta: false }, false), Some(PromptAction::NextPage));
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::PageUp,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::PrevPage)
+        );
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::PageDown,
+                    ctrl: false,
+                    meta: false
+                },
+                false
+            ),
+            Some(PromptAction::NextPage)
+        );
     }
 }

@@ -52,7 +52,11 @@ pub fn symbol(done: bool, aborted: bool, exited: bool) -> String {
 /// Delimiter between message and input.
 pub fn delimiter(completing: bool) -> String {
     let fig = Figures::default();
-    let d = if completing { fig.ellipsis } else { fig.pointer_small };
+    let d = if completing {
+        fig.ellipsis
+    } else {
+        fig.pointer_small
+    };
     let mut buf = Vec::with_capacity(8);
     write_gray!(&mut buf, "{}", d).ok();
     String::from_utf8_lossy(&buf).into_owned()
