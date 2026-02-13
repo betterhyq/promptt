@@ -1,6 +1,6 @@
 [package]
 name = "promptt"
-version = "1.0.3"
+version = "1.0.4"
 authors = ["YONGQI <betterhyq@qq.com>"]
 edition = "2024"
 description = "A interactive CLI prompts library, lightweight and easy to use."

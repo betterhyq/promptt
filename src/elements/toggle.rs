@@ -33,9 +33,9 @@ pub fn run_toggle<R: BufRead, W: Write>(
     write_bold!(&mut buf, "{}", opts.message).ok();
     let msg = String::from_utf8_lossy(&buf).into_owned();
     let hint = if opts.initial {
-        format!("(Y/n) {}", opts.active)
+        "(Y/n)"
     } else {
-        format!("(y/N) {}", opts.inactive)
+        "(y/N)"
     };
     let symbol = style::symbol(false, false, false);
     let delim = style::delimiter(false);

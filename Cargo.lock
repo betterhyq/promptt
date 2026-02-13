@@ -143,7 +143,7 @@ dependencies = [
 
 [[package]]
 name = "promptt"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "ansi-escapes",
  "colour",
