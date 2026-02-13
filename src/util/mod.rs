@@ -1,4 +1,4 @@
-//! Utilities for prompt rendering (mirrors prompts/lib/util).
+//! Prompt rendering utilities.
 
 pub mod action;
 pub mod clear;

@@ -1,10 +1,10 @@
-//! Prompt type registry and runners (mirrors prompts/lib/prompts).
+//! Prompt type registry and runners.
 
 use crate::elements::*;
 use crate::util::style::InputStyle;
 use std::io::{self, BufRead, Write};
 
-/// Value returned from a single prompt (mirrors JS prompt return types).
+/// Result of a single prompt.
 #[derive(Debug, Clone)]
 pub enum PromptValue {
     String(String),
@@ -13,7 +13,7 @@ pub enum PromptValue {
     List(Vec<String>),
 }
 
-/// Question for the prompt flow (mirrors the JS question object).
+/// Question configuration for the prompt flow.
 pub struct Question {
     pub name: String,
     pub type_name: String,
@@ -56,7 +56,8 @@ impl Default for Question {
     }
 }
 
-/// Run one prompt by type. Returns the value or None on cancel.
+/// Runs a prompt by type. Returns `Some(value)` or `None` on cancel.
+#[inline]
 pub fn run_prompt<R: BufRead, W: Write>(
     q: &Question,
     stdin: &mut R,

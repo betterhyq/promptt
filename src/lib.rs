@@ -1,8 +1,4 @@
-//! Rust implementation of prompts/lib: interactive CLI prompts.
-//!
-//! Uses the same concepts as the JS version: multiple question types (text, confirm, number,
-//! select, toggle, list, password, invisible) and a single `prompt()` flow that runs
-//! a series of questions and returns a map of answers.
+//! Interactive CLI prompts. Supports text, confirm, number, select, toggle, list, password, invisible.
 
 mod elements;
 mod prompts;
@@ -18,35 +14,13 @@ pub use util::{clear, key_action, lines_count, render_style, strip_ansi, Figures
 use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
 
-/// Run a series of questions and return a map of name -> PromptValue.
-/// Uses stdin and stdout for I/O.
-///
-/// # Example
-///
-/// ```ignore
-/// let questions = vec![
-///     Question {
-///         name: "name".into(),
-///         type_name: "text".into(),
-///         message: "Your name?".into(),
-///         ..Default::default()
-///     },
-///     Question {
-///         name: "ok".into(),
-///         type_name: "confirm".into(),
-///         message: "Continue?".into(),
-///         initial_bool: Some(true),
-///         ..Default::default()
-///     },
-/// ];
-/// let answers = promptt::prompt(&questions, &mut stdin.lock(), &mut stdout)?;
-/// ```
+/// Runs questions in sequence, returns name -> value map. I/O via stdin/stdout.
 pub fn prompt<R: BufRead, W: Write>(
     questions: &[Question],
     stdin: &mut R,
     stdout: &mut W,
 ) -> io::Result<HashMap<String, PromptValue>> {
-    let mut answers = HashMap::new();
+    let mut answers = HashMap::with_capacity(questions.len());
     for q in questions {
         if q.type_name.is_empty() {
             continue;

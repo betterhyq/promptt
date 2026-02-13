@@ -1,10 +1,10 @@
-//! Toggle prompt (mirrors prompts/lib/elements/toggle).
+//! Toggle prompt.
 
 use crate::util::style;
 use colour::write_bold;
 use std::io::{self, BufRead, Write};
 
-/// Options for a toggle prompt.
+/// Toggle prompt options.
 pub struct TogglePromptOptions {
     pub message: String,
     pub initial: bool,
@@ -23,13 +23,13 @@ impl Default for TogglePromptOptions {
     }
 }
 
-/// Run a toggle prompt. Returns true for active, false for inactive.
+/// Runs toggle prompt. Returns true for active, false for inactive.
 pub fn run_toggle<R: BufRead, W: Write>(
     opts: &TogglePromptOptions,
     stdin: &mut R,
     stdout: &mut W,
 ) -> io::Result<bool> {
-    let mut buf = Vec::new();
+    let mut buf = Vec::with_capacity(opts.message.len() + 32);
     write_bold!(&mut buf, "{}", opts.message).ok();
     let msg = String::from_utf8_lossy(&buf).into_owned();
     let hint = if opts.initial {
@@ -49,11 +49,7 @@ pub fn run_toggle<R: BufRead, W: Write>(
     } else {
         raw == "y" || raw == "yes" || raw == "on"
     };
-    let result_str = if value {
-        opts.active.clone()
-    } else {
-        opts.inactive.clone()
-    };
+    let result_str: &str = if value { &opts.active } else { &opts.inactive };
     let done_symbol = style::symbol(true, false, false);
     let done_delim = style::delimiter(true);
     writeln!(stdout, "\r{} {} {} {}", done_symbol, msg, done_delim, result_str)?;

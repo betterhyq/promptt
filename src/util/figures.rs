@@ -1,4 +1,4 @@
-//! Unicode symbols for prompt UI (mirrors prompts/lib/util/figures).
+//! Unicode symbols for prompt UI.
 
 #[derive(Clone)]
 pub struct Figures {

@@ -1,6 +1,6 @@
-//! Map key events to prompt actions (mirrors prompts/lib/util/action).
+//! Maps key events to prompt actions.
 
-/// Represents a key event (simplified for line-based input).
+/// Key event for line-based input.
 #[derive(Debug, Clone)]
 pub struct Key {
     pub name: KeyName,
@@ -29,7 +29,7 @@ pub enum KeyName {
     Unknown,
 }
 
-/// Action name that a prompt element can handle.
+/// Action a prompt element can handle.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PromptAction {
     First,
@@ -51,7 +51,8 @@ pub enum PromptAction {
     End,
 }
 
-/// Map key to action. Returns None if the key should be passed as raw input.
+/// Maps key to action. Returns `None` for raw input passthrough.
+#[inline]
 pub fn key_action(key: &Key, is_select: bool) -> Option<PromptAction> {
     if key.meta && key.name != KeyName::Escape {
         return None;

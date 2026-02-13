@@ -1,10 +1,10 @@
-//! Confirm (yes/no) prompt (mirrors prompts/lib/elements/confirm).
+//! Yes/no confirm prompt.
 
 use crate::util::style;
 use colour::{write_bold, write_gray};
 use std::io::{self, BufRead, Write};
 
-/// Options for a confirm prompt.
+/// Confirm prompt options.
 pub struct ConfirmPromptOptions {
     pub message: String,
     pub initial: bool,
@@ -27,21 +27,17 @@ impl Default for ConfirmPromptOptions {
     }
 }
 
-/// Run a confirm prompt. Returns true for yes, false for no.
+/// Runs confirm prompt. Returns true for yes, false for no.
 pub fn run_confirm<R: BufRead, W: Write>(
     opts: &ConfirmPromptOptions,
     stdin: &mut R,
     stdout: &mut W,
 ) -> io::Result<bool> {
-    let mut buf = Vec::new();
+    let mut buf = Vec::with_capacity(opts.message.len() + 32);
     write_bold!(&mut buf, "{}", opts.message).ok();
     let msg = String::from_utf8_lossy(&buf).into_owned();
-    let hint = if opts.initial {
-        opts.yes_option.clone()
-    } else {
-        opts.no_option.clone()
-    };
-    let mut gray_buf = Vec::new();
+    let hint = if opts.initial { &opts.yes_option } else { &opts.no_option };
+    let mut gray_buf = Vec::with_capacity(hint.len() + 16);
     write_gray!(&mut gray_buf, "{}", hint).ok();
     let hint_styled = String::from_utf8_lossy(&gray_buf).into_owned();
     let symbol = style::symbol(false, false, false);
@@ -56,11 +52,7 @@ pub fn run_confirm<R: BufRead, W: Write>(
     } else {
         raw == "y" || raw == "yes"
     };
-    let result_str = if value {
-        opts.yes_msg.clone()
-    } else {
-        opts.no_msg.clone()
-    };
+    let result_str: &str = if value { &opts.yes_msg } else { &opts.no_msg };
     let done_symbol = style::symbol(true, false, false);
     let done_delim = style::delimiter(true);
     writeln!(stdout, "\r{} {} {} {}", done_symbol, msg, done_delim, result_str)?;

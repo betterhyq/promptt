@@ -1,10 +1,10 @@
-//! Text prompt (mirrors prompts/lib/elements/text).
+//! Text prompt.
 
 use crate::util::style::{self, InputStyle};
 use colour::write_bold;
 use std::io::{self, BufRead, Write};
 
-/// Options for a text prompt.
+/// Text prompt options.
 pub struct TextPromptOptions {
     pub message: String,
     pub initial: Option<String>,
@@ -23,7 +23,7 @@ impl Default for TextPromptOptions {
     }
 }
 
-/// Run a text prompt. Returns the entered string (or initial if user submits empty).
+/// Runs text prompt. Returns input or initial when empty.
 pub fn run_text<R: BufRead, W: Write>(
     opts: &TextPromptOptions,
     stdin: &mut R,
@@ -31,7 +31,7 @@ pub fn run_text<R: BufRead, W: Write>(
 ) -> io::Result<String> {
     let (transform, _scale) = style::render_style(opts.style);
     let initial = opts.initial.as_deref().unwrap_or("");
-    let mut output = Vec::new();
+    let mut output = Vec::with_capacity(opts.message.len() + 32);
     write_bold!(&mut output, "{}", opts.message).ok();
     let msg_styled = String::from_utf8_lossy(&output).into_owned();
     let symbol = style::symbol(false, false, false);

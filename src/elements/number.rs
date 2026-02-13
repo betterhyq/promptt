@@ -1,10 +1,10 @@
-//! Number prompt (mirrors prompts/lib/elements/number).
+//! Number prompt.
 
 use crate::util::style;
 use colour::write_bold;
 use std::io::{self, BufRead, Write};
 
-/// Options for a number prompt.
+/// Number prompt options.
 pub struct NumberPromptOptions {
     pub message: String,
     pub initial: Option<f64>,
@@ -34,13 +34,13 @@ fn round_n(x: f64, n: u32) -> f64 {
     (x * factor).round() / factor
 }
 
-/// Run a number prompt. Returns the number (or initial if empty and initial is set).
+/// Runs number prompt. Returns value or initial/0 when empty.
 pub fn run_number<R: BufRead, W: Write>(
     opts: &NumberPromptOptions,
     stdin: &mut R,
     stdout: &mut W,
 ) -> io::Result<f64> {
-    let mut buf = Vec::new();
+    let mut buf = Vec::with_capacity(opts.message.len() + 32);
     write_bold!(&mut buf, "{}", opts.message).ok();
     let msg = String::from_utf8_lossy(&buf).into_owned();
     let initial_str = opts.initial.map(|n| {
@@ -66,9 +66,8 @@ pub fn run_number<R: BufRead, W: Write>(
             raw.parse::<i64>().map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, opts.error_msg.as_deref().unwrap_or("invalid number")))? as f64
         };
         let v = round_n(v, opts.round);
-        let v = opts.min.map(|m| v.max(m)).unwrap_or(v);
-        let v = opts.max.map(|m| v.min(m)).unwrap_or(v);
-        v
+        let v = opts.min.map_or(v, |m| v.max(m));
+        opts.max.map_or(v, |m| v.min(m))
     };
     let displayed = if opts.float {
         format!("{:.prec$}", value, prec = opts.round as usize)

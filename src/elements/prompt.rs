@@ -1,10 +1,9 @@
-//! Base prompt (mirrors prompts/lib/elements/prompt).
-//! Line-based: no raw TTY; uses stdout for display and stdin read_line for input.
+//! Base prompt. Line-based I/O via stdout/stdin.
 
 use ansi_escapes::Beep;
 use std::io::{self, Write};
 
-/// Base behavior for all prompts: write output, optionally beep.
+/// Base prompt behavior (output, beep).
 pub struct Prompt;
 
 impl Prompt {

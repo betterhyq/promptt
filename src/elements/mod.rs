@@ -1,4 +1,4 @@
-//! Prompt elements (mirrors prompts/lib/elements).
+//! Prompt element implementations.
 
 mod confirm;
 mod number;
