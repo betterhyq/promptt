@@ -3,7 +3,7 @@
 //! Run with: cargo run (from demo/ or workspace root)
 
 use promptt::{prompt, Choice, PromptValue, Question};
-use std::io::{self, BufRead, Write};
+use std::io::{self, Write};
 
 fn main() -> io::Result<()> {
     let stdin = io::stdin();

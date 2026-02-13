@@ -2,7 +2,7 @@
 
 use crate::util::figures::Figures;
 use crate::util::style;
-use ansi_escapes::{CursorUp, EraseLines};
+use ansi_escapes::EraseLines;
 use colour::{write_bold, write_cyan, write_gray};
 use std::io::{self, BufRead, Write};
 
@@ -275,8 +275,9 @@ fn run_select_interactive<R: BufRead, W: Write>(
                     _ => {}
                 }
             }
+            // EraseLines erases current line then moves up; we're on the "Answer" line,
+            // so erase upward to clear the whole block. Cursor ends at top line, col 0.
             let up = n_lines as u16;
-            write!(stdout, "{}", CursorUp(up))?;
             write!(stdout, "{}", EraseLines(up))?;
             writeln!(stdout, "{} {} {}", symbol, msg, delim)?;
             write_choices(opts, fig, *selected, stdout)?;
