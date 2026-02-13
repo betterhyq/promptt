@@ -3,6 +3,7 @@
 ![Crates.io Version](https://img.shields.io/crates/v/promptt)
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/promptt)
 ![Crates.io License](https://img.shields.io/crates/l/promptt)
+![GitHub Repo stars](https://img.shields.io/github/stars/betterhyq/promptt)
 
 `promptt` is a lightweight, interactive CLI prompts library for Rust. It supports text, confirm, number, select, toggle, list, password, and invisible inputs—ideal for building terminal wizards, config generators, or any step-by-step CLI flow.
 
