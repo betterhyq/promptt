@@ -12,3 +12,5 @@ keywords = [""]
 categories = ["development-tools"]
 
 [dependencies]
+ansi-escapes = "0.2.0"
+colour = "2.1.0"
