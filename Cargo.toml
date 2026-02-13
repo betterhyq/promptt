@@ -1,12 +1,12 @@
 [package]
-name = "packageName"
+name = "promptt"
 version = "0.0.1"
 authors = ["YONGQI <betterhyq@qq.com>"]
 edition = "2024"
 description = "A template for creating a crate package"
 readme = "README.md"
-homepage = "https://github.com/betterhyq/packageName"
-repository = "https://github.com/betterhyq/packageName.git"
+homepage = "https://github.com/betterhyq/promptt"
+repository = "https://github.com/betterhyq/promptt.git"
 license = "MIT"
 keywords = [""]
 categories = ["development-tools"]

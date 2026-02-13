@@ -1,15 +1,15 @@
-# packageName
+# promptt
 
-![Crates.io Version](https://img.shields.io/crates/v/packageName)
-![Crates.io Total Downloads](https://img.shields.io/crates/d/packageName)
-![Crates.io License](https://img.shields.io/crates/l/packageName)
+![Crates.io Version](https://img.shields.io/crates/v/promptt)
+![Crates.io Total Downloads](https://img.shields.io/crates/d/promptt)
+![Crates.io License](https://img.shields.io/crates/l/promptt)
 
 ## Installation
 
 Add this crate by cargo
 
 ```bash
-cargo add packageName
+cargo add promptt
 ```
 
 ## Contribution
