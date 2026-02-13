@@ -36,8 +36,9 @@ pub fn run_text<R: BufRead, W: Write>(
     let msg_styled = String::from_utf8_lossy(&output).into_owned();
     let symbol = style::symbol(false, false, false);
     let delim = style::delimiter(false);
-    let placeholder = initial.to_string();
-    let prompt_line = format!("{} {} {} {}", symbol, msg_styled, delim, placeholder);
+    // Don't pre-display initial value: it's not editable (just printed text),
+    // so users couldn't delete or replace it. Use initial only when Enter with empty input.
+    let prompt_line = format!("{} {} {} ", symbol, msg_styled, delim);
     write!(stdout, "{}", prompt_line)?;
     stdout.flush()?;
     let mut line = String::new();

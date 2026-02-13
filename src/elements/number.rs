@@ -43,19 +43,11 @@ pub fn run_number<R: BufRead, W: Write>(
     let mut buf = Vec::with_capacity(opts.message.len() + 32);
     write_bold!(&mut buf, "{}", opts.message).ok();
     let msg = String::from_utf8_lossy(&buf).into_owned();
-    let initial_str = opts
-        .initial
-        .map(|n| {
-            if opts.float {
-                format!("{:.prec$}", n, prec = opts.round as usize)
-            } else {
-                format!("{}", n as i64)
-            }
-        })
-        .unwrap_or_default();
+    // Don't pre-display initial value: it's not editable (just printed text),
+    // so users couldn't delete or replace it. Use initial only when Enter with empty input.
     let symbol = style::symbol(false, false, false);
     let delim = style::delimiter(false);
-    write!(stdout, "{} {} {} {}", symbol, msg, delim, initial_str)?;
+    write!(stdout, "{} {} {} ", symbol, msg, delim)?;
     stdout.flush()?;
     let mut line = String::new();
     stdin.read_line(&mut line)?;
