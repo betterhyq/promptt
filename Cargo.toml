@@ -2,7 +2,7 @@
 name = "promptt"
 version = "1.0.0"
 authors = ["YONGQI <betterhyq@qq.com>"]
-edition = "2021"
+edition = "2024"
 description = "A interactive CLI prompts library, lightweight and easy to use."
 readme = "README.md"
 homepage = "https://github.com/betterhyq/promptt"
