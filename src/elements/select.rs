@@ -84,3 +84,83 @@ pub fn run_select<R: BufRead, W: Write>(
     stdout.flush()?;
     Ok(choice.value.clone())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn choice_new() {
+        let c = Choice::new("Title", "value");
+        assert_eq!(c.title, "Title");
+        assert_eq!(c.value, "value");
+        assert!(c.description.is_none());
+        assert!(!c.disabled);
+    }
+
+    #[test]
+    fn run_select_by_number() {
+        let opts = SelectPromptOptions {
+            message: "Pick".into(),
+            choices: vec![
+                Choice::new("One", "1"),
+                Choice::new("Two", "2"),
+                Choice::new("Three", "3"),
+            ],
+            initial: None,
+            hint: None,
+        };
+        let mut stdin = Cursor::new(b"2\n");
+        let mut stdout = Vec::new();
+        let r = run_select(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "2");
+    }
+
+    #[test]
+    fn run_select_by_title_case_insensitive() {
+        let opts = SelectPromptOptions {
+            message: "Pick".into(),
+            choices: vec![Choice::new("Apple", "apple"), Choice::new("Banana", "banana")],
+            initial: None,
+            hint: None,
+        };
+        let mut stdin = Cursor::new(b"BANANA\n");
+        let mut stdout = Vec::new();
+        let r = run_select(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "banana");
+    }
+
+    #[test]
+    fn run_select_invalid_number_falls_back_to_initial_or_zero() {
+        let opts = SelectPromptOptions {
+            message: "Pick".into(),
+            choices: vec![Choice::new("A", "a"), Choice::new("B", "b")],
+            initial: Some(1),
+            hint: None,
+        };
+        let mut stdin = Cursor::new(b"xyz\n");
+        let mut stdout = Vec::new();
+        let r = run_select(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "b");
+    }
+
+    #[test]
+    fn run_select_disabled_choice_returns_err() {
+        let mut c = Choice::new("Disabled", "d");
+        c.disabled = true;
+        let opts = SelectPromptOptions {
+            message: "Pick".into(),
+            choices: vec![Choice::new("A", "a"), c],
+            initial: Some(1),
+            hint: None,
+        };
+        let mut stdin = Cursor::new(b"2\n");
+        let mut stdout = Vec::new();
+        let r = run_select(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_err());
+    }
+}

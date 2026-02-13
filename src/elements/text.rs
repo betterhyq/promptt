@@ -51,3 +51,64 @@ pub fn run_text<R: BufRead, W: Write>(
     stdout.flush()?;
     Ok(value)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::util::style::InputStyle;
+    use std::io::Cursor;
+
+    #[test]
+    fn text_prompt_options_default() {
+        let opts = TextPromptOptions::default();
+        assert!(opts.message.is_empty());
+        assert!(opts.initial.is_none());
+        assert_eq!(opts.style, InputStyle::Default);
+        assert!(opts.error_msg.is_some());
+    }
+
+    #[test]
+    fn run_text_returns_entered_value() {
+        let opts = TextPromptOptions {
+            message: "Name?".into(),
+            initial: None,
+            style: InputStyle::Default,
+            error_msg: None,
+        };
+        let mut stdin = Cursor::new(b"Bob\n");
+        let mut stdout = Vec::new();
+        let r = run_text(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "Bob");
+    }
+
+    #[test]
+    fn run_text_empty_uses_initial() {
+        let opts = TextPromptOptions {
+            message: "Name?".into(),
+            initial: Some("default".into()),
+            style: InputStyle::Default,
+            error_msg: None,
+        };
+        let mut stdin = Cursor::new(b"\n");
+        let mut stdout = Vec::new();
+        let r = run_text(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "default");
+    }
+
+    #[test]
+    fn run_text_trims_input() {
+        let opts = TextPromptOptions {
+            message: "X?".into(),
+            initial: None,
+            style: InputStyle::Default,
+            error_msg: None,
+        };
+        let mut stdin = Cursor::new(b"  spaced  \n");
+        let mut stdout = Vec::new();
+        let r = run_text(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "spaced");
+    }
+}

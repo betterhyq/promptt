@@ -12,3 +12,16 @@ impl Prompt {
         write!(out, "{}", Beep)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn prompt_bell_writes_to_output() {
+        let mut buf = Vec::new();
+        let r = Prompt::bell(&mut buf);
+        assert!(r.is_ok());
+        assert!(!buf.is_empty());
+    }
+}

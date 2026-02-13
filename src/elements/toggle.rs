@@ -60,3 +60,70 @@ pub fn run_toggle<R: BufRead, W: Write>(
     stdout.flush()?;
     Ok(value)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn toggle_prompt_options_default() {
+        let opts = TogglePromptOptions::default();
+        assert!(opts.message.is_empty());
+        assert!(!opts.initial);
+        assert_eq!(opts.active, "on");
+        assert_eq!(opts.inactive, "off");
+    }
+
+    #[test]
+    fn run_toggle_on() {
+        let opts = TogglePromptOptions {
+            message: "Enable?".into(),
+            initial: false,
+            active: "on".into(),
+            inactive: "off".into(),
+        };
+        let mut stdin = Cursor::new(b"y\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_toggle(&opts, &mut stdin, &mut stdout).unwrap(), true);
+    }
+
+    #[test]
+    fn run_toggle_yes_on() {
+        let opts = TogglePromptOptions {
+            message: "?".into(),
+            initial: false,
+            active: "yes".into(),
+            inactive: "no".into(),
+        };
+        let mut stdin = Cursor::new(b"yes\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_toggle(&opts, &mut stdin, &mut stdout).unwrap(), true);
+    }
+
+    #[test]
+    fn run_toggle_off() {
+        let opts = TogglePromptOptions {
+            message: "Enable?".into(),
+            initial: true,
+            active: "on".into(),
+            inactive: "off".into(),
+        };
+        let mut stdin = Cursor::new(b"n\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_toggle(&opts, &mut stdin, &mut stdout).unwrap(), false);
+    }
+
+    #[test]
+    fn run_toggle_empty_uses_initial() {
+        let opts = TogglePromptOptions {
+            message: "?".into(),
+            initial: true,
+            active: "on".into(),
+            inactive: "off".into(),
+        };
+        let mut stdin = Cursor::new(b"\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_toggle(&opts, &mut stdin, &mut stdout).unwrap(), true);
+    }
+}

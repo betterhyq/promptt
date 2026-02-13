@@ -81,3 +81,108 @@ pub fn run_number<R: BufRead, W: Write>(
     stdout.flush()?;
     Ok(value)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn number_prompt_options_default() {
+        let opts = NumberPromptOptions::default();
+        assert!(opts.message.is_empty());
+        assert!(opts.initial.is_none());
+        assert!(opts.min.is_none());
+        assert!(opts.max.is_none());
+        assert!(!opts.float);
+        assert_eq!(opts.round, 2);
+        assert!(opts.error_msg.is_some());
+    }
+
+    #[test]
+    fn run_number_integer() {
+        let opts = NumberPromptOptions {
+            message: "Count?".into(),
+            float: false,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"100\n");
+        let mut stdout = Vec::new();
+        let r = run_number(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), 100.0);
+    }
+
+    #[test]
+    fn run_number_float() {
+        let opts = NumberPromptOptions {
+            message: "Value?".into(),
+            float: true,
+            round: 2,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"2.5\n");
+        let mut stdout = Vec::new();
+        let r = run_number(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert!((r.unwrap() - 2.5).abs() < 0.001);
+    }
+
+    #[test]
+    fn run_number_empty_uses_initial() {
+        let opts = NumberPromptOptions {
+            message: "N?".into(),
+            initial: Some(7.0),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_number(&opts, &mut stdin, &mut stdout).unwrap(), 7.0);
+    }
+
+    #[test]
+    fn run_number_empty_no_initial_defaults_zero() {
+        let opts = NumberPromptOptions {
+            message: "N?".into(),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_number(&opts, &mut stdin, &mut stdout).unwrap(), 0.0);
+    }
+
+    #[test]
+    fn run_number_min_clamp() {
+        let opts = NumberPromptOptions {
+            message: "N?".into(),
+            min: Some(10.0),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"5\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_number(&opts, &mut stdin, &mut stdout).unwrap(), 10.0);
+    }
+
+    #[test]
+    fn run_number_max_clamp() {
+        let opts = NumberPromptOptions {
+            message: "N?".into(),
+            max: Some(10.0),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"99\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_number(&opts, &mut stdin, &mut stdout).unwrap(), 10.0);
+    }
+
+    #[test]
+    fn run_number_invalid_returns_err() {
+        let opts = NumberPromptOptions {
+            message: "N?".into(),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"not a number\n");
+        let mut stdout = Vec::new();
+        assert!(run_number(&opts, &mut stdin, &mut stdout).is_err());
+    }
+}

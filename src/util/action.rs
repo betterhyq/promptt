@@ -92,3 +92,104 @@ pub fn key_action(key: &Key, is_select: bool) -> Option<PromptAction> {
         _ => None,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn key_char(c: char) -> Key {
+        Key { name: KeyName::Char(c), ctrl: false, meta: false }
+    }
+
+    fn key_ctrl(c: char) -> Key {
+        Key { name: KeyName::Char(c), ctrl: true, meta: false }
+    }
+
+    #[test]
+    fn return_submit() {
+        assert_eq!(key_action(&Key { name: KeyName::Return, ctrl: false, meta: false }, false), Some(PromptAction::Submit));
+        assert_eq!(key_action(&Key { name: KeyName::Enter, ctrl: false, meta: false }, false), Some(PromptAction::Submit));
+    }
+
+    #[test]
+    fn backspace_delete() {
+        assert_eq!(key_action(&Key { name: KeyName::Backspace, ctrl: false, meta: false }, false), Some(PromptAction::Delete));
+    }
+
+    #[test]
+    fn delete_forward() {
+        assert_eq!(key_action(&Key { name: KeyName::Delete, ctrl: false, meta: false }, false), Some(PromptAction::DeleteForward));
+    }
+
+    #[test]
+    fn escape_exit() {
+        assert_eq!(key_action(&Key { name: KeyName::Escape, ctrl: false, meta: false }, false), Some(PromptAction::Exit));
+    }
+
+    #[test]
+    fn arrow_keys() {
+        assert_eq!(key_action(&Key { name: KeyName::Up, ctrl: false, meta: false }, false), Some(PromptAction::Up));
+        assert_eq!(key_action(&Key { name: KeyName::Down, ctrl: false, meta: false }, false), Some(PromptAction::Down));
+        assert_eq!(key_action(&Key { name: KeyName::Left, ctrl: false, meta: false }, false), Some(PromptAction::Left));
+        assert_eq!(key_action(&Key { name: KeyName::Right, ctrl: false, meta: false }, false), Some(PromptAction::Right));
+    }
+
+    #[test]
+    fn home_end() {
+        assert_eq!(key_action(&Key { name: KeyName::Home, ctrl: false, meta: false }, false), Some(PromptAction::Home));
+        assert_eq!(key_action(&Key { name: KeyName::End, ctrl: false, meta: false }, false), Some(PromptAction::End));
+    }
+
+    #[test]
+    fn ctrl_a_first() {
+        assert_eq!(key_action(&key_ctrl('a'), false), Some(PromptAction::First));
+    }
+
+    #[test]
+    fn ctrl_c_abort() {
+        assert_eq!(key_action(&key_ctrl('c'), false), Some(PromptAction::Abort));
+    }
+
+    #[test]
+    fn ctrl_d_abort() {
+        assert_eq!(key_action(&key_ctrl('d'), false), Some(PromptAction::Abort));
+    }
+
+    #[test]
+    fn ctrl_e_last() {
+        assert_eq!(key_action(&key_ctrl('e'), false), Some(PromptAction::Last));
+    }
+
+    #[test]
+    fn ctrl_g_reset() {
+        assert_eq!(key_action(&key_ctrl('g'), false), Some(PromptAction::Reset));
+    }
+
+    #[test]
+    fn select_j_k() {
+        assert_eq!(key_action(&key_char('j'), true), Some(PromptAction::Down));
+        assert_eq!(key_action(&key_char('k'), true), Some(PromptAction::Up));
+    }
+
+    #[test]
+    fn non_select_j_k_passthrough() {
+        assert_eq!(key_action(&key_char('j'), false), None);
+        assert_eq!(key_action(&key_char('k'), false), None);
+    }
+
+    #[test]
+    fn regular_char_none() {
+        assert_eq!(key_action(&key_char('x'), false), None);
+    }
+
+    #[test]
+    fn tab_next() {
+        assert_eq!(key_action(&Key { name: KeyName::Tab, ctrl: false, meta: false }, false), Some(PromptAction::Next));
+    }
+
+    #[test]
+    fn page_up_down() {
+        assert_eq!(key_action(&Key { name: KeyName::PageUp, ctrl: false, meta: false }, false), Some(PromptAction::PrevPage));
+        assert_eq!(key_action(&Key { name: KeyName::PageDown, ctrl: false, meta: false }, false), Some(PromptAction::NextPage));
+    }
+}

@@ -4,7 +4,7 @@ use crate::util::figures::Figures;
 use colour::{write_cyan, write_gray, write_green, write_red, write_yellow};
 use std::io::Write;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum InputStyle {
     Default,
     Password,
@@ -55,4 +55,62 @@ pub fn delimiter(completing: bool) -> String {
     let d = if completing { fig.ellipsis } else { fig.pointer_small };
     write_gray!(&mut buf, "{}", d).ok();
     String::from_utf8_lossy(&buf).into_owned()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn render_style_default_scale_one() {
+        let (transform, scale) = render_style(InputStyle::Default);
+        assert_eq!(scale, 1);
+        assert_eq!(transform.render("hello", InputStyle::Default), "hello");
+    }
+
+    #[test]
+    fn render_style_password_masks() {
+        let (transform, scale) = render_style(InputStyle::Password);
+        assert_eq!(scale, 1);
+        assert_eq!(transform.render("secret", InputStyle::Password), "******");
+    }
+
+    #[test]
+    fn render_style_invisible_empty() {
+        let (transform, scale) = render_style(InputStyle::Invisible);
+        assert_eq!(scale, 0);
+        assert_eq!(transform.render("hidden", InputStyle::Invisible), "");
+    }
+
+    #[test]
+    fn symbol_done_contains_tick() {
+        let s = symbol(true, false, false);
+        assert!(!s.is_empty());
+    }
+
+    #[test]
+    fn symbol_aborted_contains_cross() {
+        let s = symbol(false, true, false);
+        assert!(!s.is_empty());
+    }
+
+    #[test]
+    fn symbol_exited_contains_cross() {
+        let s = symbol(false, false, true);
+        assert!(!s.is_empty());
+    }
+
+    #[test]
+    fn symbol_pending_contains_question() {
+        let s = symbol(false, false, false);
+        assert!(!s.is_empty());
+    }
+
+    #[test]
+    fn delimiter_completing_and_not_differ() {
+        let d_false = delimiter(false);
+        let d_true = delimiter(true);
+        assert!(!d_false.is_empty());
+        assert!(!d_true.is_empty());
+    }
 }

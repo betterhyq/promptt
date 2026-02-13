@@ -71,6 +71,8 @@ pub fn prompt<R: BufRead, W: Write>(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Cursor;
+
     #[test]
     fn test_strip_ansi() {
         let s = "\x1b[31mred\x1b[0m";
@@ -89,5 +91,84 @@ mod tests {
         let q = Question::default();
         assert!(q.type_name.is_empty());
         assert!(q.message.is_empty());
+    }
+
+    #[test]
+    fn prompt_skips_empty_type_name() {
+        let questions = vec![
+            Question {
+                name: "skip".into(),
+                type_name: String::new(),
+                message: "Skipped?".into(),
+                ..Default::default()
+            },
+        ];
+        let mut stdin = Cursor::new(b"");
+        let mut stdout = Vec::new();
+        let r = prompt(&questions, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        let answers = r.unwrap();
+        assert!(answers.is_empty());
+    }
+
+    #[test]
+    fn prompt_requires_message() {
+        let questions = vec![Question {
+            name: "x".into(),
+            type_name: "text".into(),
+            message: String::new(),
+            ..Default::default()
+        }];
+        let mut stdin = Cursor::new(b"");
+        let mut stdout = Vec::new();
+        let r = prompt(&questions, &mut stdin, &mut stdout);
+        assert!(r.is_err());
+    }
+
+    #[test]
+    fn prompt_collects_answers() {
+        let questions = vec![
+            Question {
+                name: "name".into(),
+                type_name: "text".into(),
+                message: "Name?".into(),
+                ..Default::default()
+            },
+            Question {
+                name: "ok".into(),
+                type_name: "confirm".into(),
+                message: "Ok?".into(),
+                initial_bool: Some(false),
+                ..Default::default()
+            },
+        ];
+        let mut stdin = Cursor::new(b"Alice\ny\n");
+        let mut stdout = Vec::new();
+        let r = prompt(&questions, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        let answers = r.unwrap();
+        assert_eq!(answers.len(), 2);
+        match answers.get("name") {
+            Some(PromptValue::String(s)) => assert_eq!(s, "Alice"),
+            _ => panic!("expected name to be String(\"Alice\")"),
+        }
+        match answers.get("ok") {
+            Some(PromptValue::Bool(b)) => assert!(*b),
+            _ => panic!("expected ok to be Bool(true)"),
+        }
+    }
+
+    #[test]
+    fn prompt_returns_err_on_invalid_question_type() {
+        let questions = vec![Question {
+            name: "x".into(),
+            type_name: "invalid_type".into(),
+            message: "Msg".into(),
+            ..Default::default()
+        }];
+        let mut stdin = Cursor::new(b"");
+        let mut stdout = Vec::new();
+        let r = prompt(&questions, &mut stdin, &mut stdout);
+        assert!(r.is_err());
     }
 }

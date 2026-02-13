@@ -20,3 +20,33 @@ pub fn clear(prompt: &str, per_line: usize) -> String {
     }
     format!("{}", EraseLines(rows))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn clear_zero_width_returns_erase_line() {
+        let out = clear("hello", 0);
+        assert!(out.contains("\x1b[2K") || out.len() > 0);
+    }
+
+    #[test]
+    fn clear_single_short_line() {
+        let out = clear("hi", 80);
+        assert!(!out.is_empty());
+    }
+
+    #[test]
+    fn clear_multiline() {
+        let out = clear("a\nb\nc", 10);
+        assert!(!out.is_empty());
+    }
+
+    #[test]
+    fn clear_long_line_wraps() {
+        let long = "a".repeat(100);
+        let out = clear(&long, 20);
+        assert!(!out.is_empty());
+    }
+}

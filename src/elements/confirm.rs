@@ -67,3 +67,68 @@ pub fn run_confirm<R: BufRead, W: Write>(
     stdout.flush()?;
     Ok(value)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn confirm_prompt_options_default() {
+        let opts = ConfirmPromptOptions::default();
+        assert!(opts.message.is_empty());
+        assert!(!opts.initial);
+        assert_eq!(opts.yes_msg, "yes");
+        assert_eq!(opts.no_msg, "no");
+        assert_eq!(opts.yes_option, "(Y/n)");
+        assert_eq!(opts.no_option, "(y/N)");
+    }
+
+    #[test]
+    fn run_confirm_yes() {
+        let opts = ConfirmPromptOptions {
+            message: "Continue?".into(),
+            initial: false,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"yes\n");
+        let mut stdout = Vec::new();
+        let r = run_confirm(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), true);
+    }
+
+    #[test]
+    fn run_confirm_y_yes() {
+        let opts = ConfirmPromptOptions { message: "Ok?".into(), ..Default::default() };
+        let mut stdin = Cursor::new(b"y\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_confirm(&opts, &mut stdin, &mut stdout).unwrap(), true);
+    }
+
+    #[test]
+    fn run_confirm_no() {
+        let opts = ConfirmPromptOptions {
+            message: "Continue?".into(),
+            initial: true,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"n\n");
+        let mut stdout = Vec::new();
+        let r = run_confirm(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), false);
+    }
+
+    #[test]
+    fn run_confirm_empty_uses_initial() {
+        let opts = ConfirmPromptOptions {
+            message: "?".into(),
+            initial: true,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_confirm(&opts, &mut stdin, &mut stdout).unwrap(), true);
+    }
+}

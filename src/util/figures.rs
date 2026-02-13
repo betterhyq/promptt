@@ -58,3 +58,33 @@ impl Figures {
         Self::default()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn figures_all_non_empty() {
+        let f = Figures::new();
+        assert!(!f.arrow_up.is_empty());
+        assert!(!f.arrow_down.is_empty());
+        assert!(!f.arrow_left.is_empty());
+        assert!(!f.arrow_right.is_empty());
+        assert!(!f.radio_on.is_empty());
+        assert!(!f.radio_off.is_empty());
+        assert!(!f.tick.is_empty());
+        assert!(!f.cross.is_empty());
+        assert!(!f.ellipsis.is_empty());
+        assert!(!f.pointer_small.is_empty());
+        assert!(!f.line.is_empty());
+        assert!(!f.pointer.is_empty());
+    }
+
+    #[test]
+    fn figures_default_equals_new() {
+        let a = Figures::default();
+        let b = Figures::new();
+        assert_eq!(a.tick, b.tick);
+        assert_eq!(a.cross, b.cross);
+    }
+}

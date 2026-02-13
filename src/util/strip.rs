@@ -17,3 +17,34 @@ fn ansi_re() -> &'static Regex {
 pub fn strip_ansi(s: &str) -> String {
     ansi_re().replace_all(s, "").into_owned()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn strip_ansi_removes_red() {
+        assert_eq!(strip_ansi("\x1b[31mred\x1b[0m"), "red");
+    }
+
+    #[test]
+    fn strip_ansi_plain_unchanged() {
+        assert_eq!(strip_ansi("hello world"), "hello world");
+    }
+
+    #[test]
+    fn strip_ansi_empty() {
+        assert_eq!(strip_ansi(""), "");
+    }
+
+    #[test]
+    fn strip_ansi_multiple_sequences() {
+        let s = "\x1b[1mbold\x1b[0m \x1b[32mgreen\x1b[0m";
+        assert_eq!(strip_ansi(s), "bold green");
+    }
+
+    #[test]
+    fn strip_ansi_csi_style_codes() {
+        assert_eq!(strip_ansi("\x1b[0;33myellow\x1b[0m"), "yellow");
+    }
+}

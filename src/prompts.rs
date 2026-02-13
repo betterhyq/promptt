@@ -148,3 +148,247 @@ pub fn run_prompt<R: BufRead, W: Write>(
         )),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn question_default_values() {
+        let q = Question::default();
+        assert!(q.name.is_empty());
+        assert!(q.type_name.is_empty());
+        assert!(q.message.is_empty());
+        assert!(q.initial_text.is_none());
+        assert!(q.initial_number.is_none());
+        assert!(q.initial_bool.is_none());
+        assert!(q.choices.is_none());
+        assert!(q.separator.is_none());
+        assert!(!q.float);
+        assert_eq!(q.round, 2);
+        assert!(q.min.is_none());
+        assert!(q.max.is_none());
+        assert!(q.active.is_none());
+        assert!(q.inactive.is_none());
+        assert!(q.hint.is_none());
+    }
+
+    #[test]
+    fn run_prompt_text() {
+        let q = Question {
+            name: "name".into(),
+            type_name: "text".into(),
+            message: "Your name?".into(),
+            initial_text: Some("default".into()),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"Alice\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        let val = out.unwrap();
+        assert!(matches!(val, Some(PromptValue::String(s)) if s == "Alice"));
+    }
+
+    #[test]
+    fn run_prompt_text_empty_uses_initial() {
+        let q = Question {
+            name: "x".into(),
+            type_name: "text".into(),
+            message: "Msg".into(),
+            initial_text: Some("init".into()),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        let val = out.unwrap();
+        assert!(matches!(val, Some(PromptValue::String(s)) if s == "init"));
+    }
+
+    #[test]
+    fn run_prompt_confirm_yes() {
+        let q = Question {
+            name: "ok".into(),
+            type_name: "confirm".into(),
+            message: "Continue?".into(),
+            initial_bool: Some(false),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"y\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(out.unwrap(), Some(PromptValue::Bool(true))));
+    }
+
+    #[test]
+    fn run_prompt_confirm_no() {
+        let q = Question {
+            name: "ok".into(),
+            type_name: "confirm".into(),
+            message: "Continue?".into(),
+            initial_bool: Some(true),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"n\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(out.unwrap(), Some(PromptValue::Bool(false))));
+    }
+
+    #[test]
+    fn run_prompt_number_integer() {
+        let q = Question {
+            name: "n".into(),
+            type_name: "number".into(),
+            message: "Count?".into(),
+            float: false,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"42\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(out.unwrap(), Some(PromptValue::Float(x)) if x == 42.0));
+    }
+
+    #[test]
+    fn run_prompt_number_float() {
+        let q = Question {
+            name: "n".into(),
+            type_name: "number".into(),
+            message: "Value?".into(),
+            float: true,
+            round: 2,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"3.14\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        let v = out.unwrap().unwrap();
+        if let PromptValue::Float(x) = v {
+            assert!((x - 3.14).abs() < 0.01);
+        } else {
+            panic!("expected Float");
+        }
+    }
+
+    #[test]
+    fn run_prompt_toggle_on() {
+        let q = Question {
+            name: "t".into(),
+            type_name: "toggle".into(),
+            message: "Enable?".into(),
+            initial_bool: Some(false),
+            active: Some("on".into()),
+            inactive: Some("off".into()),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"y\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(out.unwrap(), Some(PromptValue::Bool(true))));
+    }
+
+    #[test]
+    fn run_prompt_select_by_number() {
+        let q = Question {
+            name: "choice".into(),
+            type_name: "select".into(),
+            message: "Pick one".into(),
+            choices: Some(vec![
+                Choice::new("A", "a"),
+                Choice::new("B", "b"),
+                Choice::new("C", "c"),
+            ]),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"2\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(out.unwrap(), Some(PromptValue::String(s)) if s == "b"));
+    }
+
+    #[test]
+    fn run_prompt_select_by_title() {
+        let q = Question {
+            name: "choice".into(),
+            type_name: "select".into(),
+            message: "Pick".into(),
+            choices: Some(vec![Choice::new("Apple", "apple"), Choice::new("Banana", "banana")]),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"Apple\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(out.unwrap(), Some(PromptValue::String(s)) if s == "apple"));
+    }
+
+    #[test]
+    fn run_prompt_list_split() {
+        let q = Question {
+            name: "items".into(),
+            type_name: "list".into(),
+            message: "Items?".into(),
+            separator: Some(",".into()),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"a, b , c\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(out.unwrap(), Some(PromptValue::List(l)) if l == ["a", "b", "c"]));
+    }
+
+    #[test]
+    fn run_prompt_password_returns_string() {
+        let q = Question {
+            name: "pwd".into(),
+            type_name: "password".into(),
+            message: "Password?".into(),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"secret\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(out.unwrap(), Some(PromptValue::String(s)) if s == "secret"));
+    }
+
+    #[test]
+    fn run_prompt_invisible_returns_string() {
+        let q = Question {
+            name: "inv".into(),
+            type_name: "invisible".into(),
+            message: "Hidden?".into(),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"value\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(out.unwrap(), Some(PromptValue::String(s)) if s == "value"));
+    }
+
+    #[test]
+    fn run_prompt_unknown_type_err() {
+        let q = Question {
+            name: "x".into(),
+            type_name: "unknown_type".into(),
+            message: "Msg".into(),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_err());
+    }
+}
