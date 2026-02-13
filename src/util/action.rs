@@ -341,4 +341,24 @@ mod tests {
             Some(PromptAction::NextPage)
         );
     }
+
+    #[test]
+    fn meta_key_passthrough() {
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Char('a'),
+                    ctrl: false,
+                    meta: true
+                },
+                false
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn ctrl_other_char_none() {
+        assert_eq!(key_action(&key_ctrl('z'), false), None);
+    }
 }

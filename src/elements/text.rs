@@ -120,4 +120,21 @@ mod tests {
         assert!(r.is_ok());
         assert_eq!(r.unwrap(), "spaced");
     }
+
+    #[test]
+    fn run_text_password_style_masks_output() {
+        let opts = TextPromptOptions {
+            message: "Secret?".into(),
+            initial: None,
+            style: InputStyle::Password,
+            error_msg: None,
+        };
+        let mut stdin = Cursor::new(b"hello\n");
+        let mut stdout = Vec::new();
+        let r = run_text(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "hello");
+        let out = String::from_utf8(stdout).unwrap();
+        assert!(out.contains("*****"));
+    }
 }

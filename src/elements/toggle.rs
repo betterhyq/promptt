@@ -126,4 +126,17 @@ mod tests {
         let mut stdout = Vec::new();
         assert_eq!(run_toggle(&opts, &mut stdin, &mut stdout).unwrap(), true);
     }
+
+    #[test]
+    fn run_toggle_on_input_turns_on() {
+        let opts = TogglePromptOptions {
+            message: "Enable?".into(),
+            initial: false,
+            active: "on".into(),
+            inactive: "off".into(),
+        };
+        let mut stdin = Cursor::new(b"on\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_toggle(&opts, &mut stdin, &mut stdout).unwrap(), true);
+    }
 }

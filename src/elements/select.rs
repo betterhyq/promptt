@@ -35,7 +35,7 @@ pub struct SelectPromptOptions {
 }
 
 /// Read a single byte from a BufRead. Blocks until one is available.
-fn read_byte<R: BufRead>(r: &mut R) -> io::Result<u8> {
+pub(crate) fn read_byte<R: BufRead>(r: &mut R) -> io::Result<u8> {
     let buf = r.fill_buf()?;
     if buf.is_empty() {
         return Err(io::Error::new(
@@ -49,7 +49,7 @@ fn read_byte<R: BufRead>(r: &mut R) -> io::Result<u8> {
 }
 
 /// Returns next enabled index when moving down, or same if none.
-fn next_enabled(choices: &[Choice], current: usize) -> usize {
+pub(crate) fn next_enabled(choices: &[Choice], current: usize) -> usize {
     for i in (current + 1)..choices.len() {
         if !choices[i].disabled {
             return i;
@@ -59,7 +59,7 @@ fn next_enabled(choices: &[Choice], current: usize) -> usize {
 }
 
 /// Returns previous enabled index when moving up, or same if none.
-fn prev_enabled(choices: &[Choice], current: usize) -> usize {
+pub(crate) fn prev_enabled(choices: &[Choice], current: usize) -> usize {
     for i in (0..current).rev() {
         if !choices[i].disabled {
             return i;
@@ -168,7 +168,7 @@ pub fn run_select<R: BufRead, W: Write>(
 }
 
 /// Strip ANSI arrow key sequences from input so "5^[[B^[[A" becomes "5".
-fn strip_arrow_escapes(s: &str) -> String {
+pub(crate) fn strip_arrow_escapes(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     let mut bytes = s.bytes();
     while let Some(b) = bytes.next() {
@@ -191,7 +191,7 @@ fn strip_arrow_escapes(s: &str) -> String {
 }
 
 /// Parse "number" or "name" into choice index.
-fn parse_selection(opts: &SelectPromptOptions, raw: &str) -> io::Result<usize> {
+pub(crate) fn parse_selection(opts: &SelectPromptOptions, raw: &str) -> io::Result<usize> {
     let idx = if let Ok(n) = raw.parse::<usize>() {
         if (1..=opts.choices.len()).contains(&n) {
             Some(n - 1)
@@ -375,5 +375,158 @@ mod tests {
         let mut stdout = Vec::new();
         let r = run_select(&opts, &mut stdin, &mut stdout);
         assert!(r.is_err());
+    }
+
+    #[test]
+    fn run_select_by_value() {
+        let opts = SelectPromptOptions {
+            message: "Pick".into(),
+            choices: vec![
+                Choice::new("One", "val1"),
+                Choice::new("Two", "val2"),
+            ],
+            initial: None,
+            hint: None,
+        };
+        let mut stdin = Cursor::new(b"val2\n");
+        let mut stdout = Vec::new();
+        let r = run_select(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "val2");
+    }
+
+    #[test]
+    fn run_select_with_custom_hint() {
+        let opts = SelectPromptOptions {
+            message: "Pick".into(),
+            choices: vec![Choice::new("A", "a")],
+            initial: None,
+            hint: Some("Custom hint".into()),
+        };
+        let mut stdin = Cursor::new(b"1\n");
+        let mut stdout = Vec::new();
+        let r = run_select(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        let out = String::from_utf8(stdout).unwrap();
+        assert!(out.contains("Custom hint"));
+    }
+
+    #[test]
+    fn run_select_input_with_arrow_escapes_stripped() {
+        let opts = SelectPromptOptions {
+            message: "Pick".into(),
+            choices: vec![Choice::new("One", "1"), Choice::new("Two", "2")],
+            initial: None,
+            hint: None,
+        };
+        let mut stdin = Cursor::new(b"2\x1b[B\x1b[A\n");
+        let mut stdout = Vec::new();
+        let r = run_select(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "2");
+    }
+
+    #[test]
+    fn strip_arrow_escapes_removes_ansi_sequences() {
+        assert_eq!(strip_arrow_escapes("5"), "5");
+        assert_eq!(strip_arrow_escapes("5\x1b[B\x1b[A"), "5");
+        assert_eq!(strip_arrow_escapes("1\x1b[C\x1b[D"), "1");
+    }
+
+    #[test]
+    fn strip_arrow_escapes_keeps_incomplete_escape() {
+        let s = "a\x1b";
+        assert_eq!(strip_arrow_escapes(s), "a\x1b");
+    }
+
+    #[test]
+    fn parse_selection_by_number() {
+        let opts = SelectPromptOptions {
+            message: "".into(),
+            choices: vec![Choice::new("A", "a"), Choice::new("B", "b")],
+            initial: None,
+            hint: None,
+        };
+        assert_eq!(parse_selection(&opts, "1").unwrap(), 0);
+        assert_eq!(parse_selection(&opts, "2").unwrap(), 1);
+    }
+
+    #[test]
+    fn parse_selection_by_title_case_insensitive() {
+        let opts = SelectPromptOptions {
+            message: "".into(),
+            choices: vec![Choice::new("Apple", "a"), Choice::new("Banana", "b")],
+            initial: None,
+            hint: None,
+        };
+        assert_eq!(parse_selection(&opts, "BANANA").unwrap(), 1);
+    }
+
+    #[test]
+    fn parse_selection_by_value() {
+        let opts = SelectPromptOptions {
+            message: "".into(),
+            choices: vec![Choice::new("One", "v1"), Choice::new("Two", "v2")],
+            initial: None,
+            hint: None,
+        };
+        assert_eq!(parse_selection(&opts, "v2").unwrap(), 1);
+    }
+
+    #[test]
+    fn parse_selection_invalid_falls_back_to_initial() {
+        let opts = SelectPromptOptions {
+            message: "".into(),
+            choices: vec![Choice::new("A", "a"), Choice::new("B", "b")],
+            initial: Some(1),
+            hint: None,
+        };
+        assert_eq!(parse_selection(&opts, "xyz").unwrap(), 1);
+    }
+
+    #[test]
+    fn parse_selection_number_out_of_range_falls_back() {
+        let opts = SelectPromptOptions {
+            message: "".into(),
+            choices: vec![Choice::new("A", "a")],
+            initial: Some(0),
+            hint: None,
+        };
+        assert_eq!(parse_selection(&opts, "99").unwrap(), 0);
+    }
+
+    #[test]
+    fn next_enabled_skips_disabled() {
+        let mut a = Choice::new("A", "a");
+        let mut b = Choice::new("B", "b");
+        b.disabled = true;
+        let mut c = Choice::new("C", "c");
+        let choices = vec![a, b, c];
+        assert_eq!(next_enabled(&choices, 0), 2);
+        assert_eq!(next_enabled(&choices, 2), 2);
+    }
+
+    #[test]
+    fn prev_enabled_skips_disabled() {
+        let mut a = Choice::new("A", "a");
+        let mut b = Choice::new("B", "b");
+        b.disabled = true;
+        let mut c = Choice::new("C", "c");
+        let choices = vec![a, b, c];
+        assert_eq!(prev_enabled(&choices, 2), 0);
+        assert_eq!(prev_enabled(&choices, 0), 0);
+    }
+
+    #[test]
+    fn read_byte_returns_first_byte() {
+        let mut r = Cursor::new(b"ab");
+        assert_eq!(read_byte(&mut r).unwrap(), b'a');
+        assert_eq!(read_byte(&mut r).unwrap(), b'b');
+    }
+
+    #[test]
+    fn read_byte_eof_returns_err() {
+        let mut r = Cursor::new(b"");
+        assert!(read_byte(&mut r).is_err());
     }
 }

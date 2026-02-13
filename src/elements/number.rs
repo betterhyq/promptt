@@ -193,4 +193,30 @@ mod tests {
         let mut stdout = Vec::new();
         assert!(run_number(&opts, &mut stdin, &mut stdout).is_err());
     }
+
+    #[test]
+    fn run_number_float_invalid_returns_err() {
+        let opts = NumberPromptOptions {
+            message: "N?".into(),
+            float: true,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"abc\n");
+        let mut stdout = Vec::new();
+        assert!(run_number(&opts, &mut stdin, &mut stdout).is_err());
+    }
+
+    #[test]
+    fn run_number_invalid_uses_error_msg_when_none() {
+        let opts = NumberPromptOptions {
+            message: "N?".into(),
+            error_msg: None,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"x\n");
+        let mut stdout = Vec::new();
+        let r = run_number(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_err());
+        assert_eq!(r.unwrap_err().to_string(), "invalid number");
+    }
 }

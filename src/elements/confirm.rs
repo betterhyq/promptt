@@ -134,4 +134,20 @@ mod tests {
         let mut stdout = Vec::new();
         assert_eq!(run_confirm(&opts, &mut stdin, &mut stdout).unwrap(), true);
     }
+
+    #[test]
+    fn run_confirm_writes_yes_msg_when_true() {
+        let opts = ConfirmPromptOptions {
+            message: "Ok?".into(),
+            initial: false,
+            yes_msg: "confirmed".into(),
+            no_msg: "cancelled".into(),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"y\n");
+        let mut stdout = Vec::new();
+        assert!(run_confirm(&opts, &mut stdin, &mut stdout).unwrap());
+        let out = String::from_utf8(stdout).unwrap();
+        assert!(out.contains("confirmed"));
+    }
 }
