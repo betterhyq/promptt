@@ -91,3 +91,7 @@ fn main() -> io::Result<()> {
 
 Published under the [MIT](./LICENSE) license.
 Made by [@YONGQI](https://github.com/betterhyq) 💛
+<br><br>
+<a href="https://github.com/betterhyq/promptt/graphs/contributors">
+<img src="https://contrib.rocks/image?repo=betterhyq/promptt" />
+</a>
