@@ -218,11 +218,15 @@ fn run_select_interactive<R: BufRead, W: Write>(
     selected: &mut usize,
     n_lines: usize,
 ) -> io::Result<()> {
+    // In raw mode, \n alone doesn't move to column 0; use \r\n so each line starts at column 0.
+    const NL: &str = "\r\n";
+
     fn write_choices(
         opts: &SelectPromptOptions,
         fig: &Figures,
         selected: usize,
         stdout: &mut dyn Write,
+        nl: &str,
     ) -> io::Result<()> {
         for (i, c) in opts.choices.iter().enumerate() {
             let prefix = if c.disabled {
@@ -235,14 +239,14 @@ fn run_select_interactive<R: BufRead, W: Write>(
             let mut line_buf = Vec::new();
             write_cyan!(&mut line_buf, " {} ", (i + 1)).ok();
             let num = String::from_utf8_lossy(&line_buf).into_owned();
-            writeln!(stdout, "  {} {} {}", num, prefix, c.title)?;
+            write!(stdout, "  {} {} {}{}", num, prefix, c.title, nl)?;
         }
         Ok(())
     }
 
-    writeln!(stdout, "{} {} {}", symbol, msg, delim)?;
-    write_choices(opts, fig, *selected, stdout)?;
-    writeln!(stdout, "  {}", hint_styled)?;
+    write!(stdout, "{} {} {}{}", symbol, msg, delim, NL)?;
+    write_choices(opts, fig, *selected, stdout, NL)?;
+    write!(stdout, "  {}{}", hint_styled, NL)?;
     write!(stdout, "  Answer (number or name): ")?;
     stdout.flush()?;
 
@@ -279,9 +283,9 @@ fn run_select_interactive<R: BufRead, W: Write>(
             // so erase upward to clear the whole block. Cursor ends at top line, col 0.
             let up = n_lines as u16;
             write!(stdout, "{}", EraseLines(up))?;
-            writeln!(stdout, "{} {} {}", symbol, msg, delim)?;
-            write_choices(opts, fig, *selected, stdout)?;
-            writeln!(stdout, "  {}", hint_styled)?;
+            write!(stdout, "{} {} {}{}", symbol, msg, delim, NL)?;
+            write_choices(opts, fig, *selected, stdout, NL)?;
+            write!(stdout, "  {}{}", hint_styled, NL)?;
             write!(stdout, "  Answer (number or name): ")?;
             stdout.flush()?;
         } else if b.is_ascii_graphic() || b == b' ' {

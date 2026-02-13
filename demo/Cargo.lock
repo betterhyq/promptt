@@ -150,9 +150,9 @@ dependencies = [
 
 [[package]]
 name = "promptt"
-version = "1.0.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04c648dd5bc81a9f6fbcb390dc61dd55dc75c0b5c306e7deaa7cdb9e11d28ec7"
+checksum = "53502d87935478fa45396f2e3dda79909eb7474f4f08592ededafb2ffbb85f8d"
 dependencies = [
  "ansi-escapes",
  "colour",
