@@ -188,8 +188,14 @@ mod tests {
         let r = prompt(&questions, &mut stdin, &mut stdout);
         assert!(r.is_ok());
         let answers = r.unwrap();
-        assert_eq!(answers.get("first"), Some(&PromptValue::String("one".into())));
-        assert_eq!(answers.get("second"), Some(&PromptValue::String("two".into())));
+        assert_eq!(
+            answers.get("first"),
+            Some(&PromptValue::String("one".into()))
+        );
+        assert_eq!(
+            answers.get("second"),
+            Some(&PromptValue::String("two".into()))
+        );
     }
 
     #[test]

@@ -32,11 +32,7 @@ pub fn run_toggle<R: BufRead, W: Write>(
     let mut buf = Vec::with_capacity(opts.message.len() + 32);
     write_bold!(&mut buf, "{}", opts.message).ok();
     let msg = String::from_utf8_lossy(&buf).into_owned();
-    let hint = if opts.initial {
-        "(Y/n)"
-    } else {
-        "(y/N)"
-    };
+    let hint = if opts.initial { "(Y/n)" } else { "(y/N)" };
     let symbol = style::symbol(false, false, false);
     let delim = style::delimiter(false);
     write!(stdout, "{} {} {} {}", symbol, msg, delim, hint)?;

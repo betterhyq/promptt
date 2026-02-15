@@ -93,7 +93,12 @@ pub fn run_select<R: BufRead, W: Write>(
     if selected >= opts.choices.len() {
         selected = 0;
     }
-    while opts.choices.get(selected).map(|c| c.disabled).unwrap_or(true) {
+    while opts
+        .choices
+        .get(selected)
+        .map(|c| c.disabled)
+        .unwrap_or(true)
+    {
         let next = next_enabled(&opts.choices, selected);
         if next == selected {
             break;
@@ -200,9 +205,9 @@ pub(crate) fn parse_selection(opts: &SelectPromptOptions, raw: &str) -> io::Resu
             None
         }
     } else {
-        opts.choices.iter().position(|c| {
-            c.title.eq_ignore_ascii_case(raw) || c.value.eq_ignore_ascii_case(raw)
-        })
+        opts.choices
+            .iter()
+            .position(|c| c.title.eq_ignore_ascii_case(raw) || c.value.eq_ignore_ascii_case(raw))
     };
     Ok(idx.or(opts.initial).unwrap_or(0))
 }
@@ -382,10 +387,7 @@ mod tests {
     fn run_select_by_value() {
         let opts = SelectPromptOptions {
             message: "Pick".into(),
-            choices: vec![
-                Choice::new("One", "val1"),
-                Choice::new("Two", "val2"),
-            ],
+            choices: vec![Choice::new("One", "val1"), Choice::new("Two", "val2")],
             initial: None,
             hint: None,
         };
