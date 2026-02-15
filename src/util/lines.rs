@@ -2,7 +2,7 @@
 
 use crate::util::strip::strip_ansi;
 
-/// Number of lines when wrapped to `per_line` width.
+/// Returns the number of lines when wrapped to `per_line` width.
 pub fn lines_count(msg: &str, per_line: usize) -> usize {
     let s = strip_ansi(msg);
     if s.is_empty() {

@@ -1,4 +1,4 @@
-//! Strips ANSI escape codes from strings.
+//! Stripping of ANSI escape codes from strings.
 
 use regex::Regex;
 use std::sync::OnceLock;
@@ -14,7 +14,7 @@ fn ansi_re() -> &'static Regex {
     })
 }
 
-/// Removes ANSI escape sequences.
+/// Removes ANSI escape sequences from the string.
 pub fn strip_ansi(s: &str) -> String {
     ansi_re().replace_all(s, "").into_owned()
 }

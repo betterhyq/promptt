@@ -4,7 +4,7 @@ use crate::elements::*;
 use crate::util::style::InputStyle;
 use std::io::{self, BufRead, Write};
 
-/// Result of a single prompt.
+/// Result value of a single prompt (string, bool, float, or list).
 #[derive(Debug, Clone)]
 pub enum PromptValue {
     String(String),
@@ -13,7 +13,7 @@ pub enum PromptValue {
     List(Vec<String>),
 }
 
-/// Question configuration for the prompt flow.
+/// Question configuration for the sequential prompt flow.
 pub struct Question {
     pub name: String,
     pub type_name: String,
@@ -56,7 +56,7 @@ impl Default for Question {
     }
 }
 
-/// Runs a prompt by type. Returns `Some(value)` or `None` on cancel.
+/// Runs a prompt by `type_name`. Returns `Some(value)` on success or `None` on cancel.
 #[inline]
 pub fn run_prompt<R: BufRead, W: Write>(
     q: &Question,

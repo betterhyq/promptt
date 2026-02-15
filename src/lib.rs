@@ -1,4 +1,4 @@
-//! Interactive CLI prompts. Supports text, confirm, number, select, toggle, list, password, invisible.
+//! Interactive CLI prompts: text, confirm, number, select, toggle, list, password, invisible.
 
 mod elements;
 mod prompts;
@@ -14,7 +14,7 @@ pub use util::{Figures, InputStyle, clear, key_action, lines_count, render_style
 use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
 
-/// Runs questions in sequence, returns name -> value map. I/O via stdin/stdout.
+/// Runs questions in sequence. Returns a name-to-value map. I/O via stdin/stdout.
 pub fn prompt<R: BufRead, W: Write>(
     questions: &[Question],
     stdin: &mut R,

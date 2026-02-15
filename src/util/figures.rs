@@ -1,5 +1,6 @@
 //! Unicode symbols for prompt UI.
 
+/// Unicode symbols used in prompt UI (arrows, radio, tick, etc.).
 #[derive(Clone)]
 pub struct Figures {
     pub arrow_up: &'static str,

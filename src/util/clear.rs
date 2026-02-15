@@ -1,4 +1,4 @@
-//! Clears prompt lines from terminal.
+//! Clearing of prompt lines on the terminal.
 
 use crate::util::strip::strip_ansi;
 use ansi_escapes::{CursorTo, EraseLine, EraseLines};
@@ -7,7 +7,7 @@ fn width(s: &str) -> usize {
     strip_ansi(s).chars().count()
 }
 
-/// Escape sequence to clear prompt over `per_line` columns.
+/// Returns escape sequence to clear the prompt over `per_line` columns.
 pub fn clear(prompt: &str, per_line: usize) -> String {
     if per_line == 0 {
         return format!("{}{}", EraseLine, CursorTo::AbsoluteX(0));

@@ -1,4 +1,4 @@
-//! Maps key events to prompt actions.
+//! Key-to-action mapping for prompt input.
 
 /// Key event for line-based input.
 #[derive(Debug, Clone)]
@@ -51,7 +51,7 @@ pub enum PromptAction {
     End,
 }
 
-/// Maps key to action. Returns `None` for raw input passthrough.
+/// Maps key to action. Returns `None` for raw input passthrough (e.g. normal typing).
 #[inline]
 pub fn key_action(key: &Key, is_select: bool) -> Option<PromptAction> {
     if key.meta && key.name != KeyName::Escape {

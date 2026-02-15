@@ -4,6 +4,7 @@ use crate::util::figures::Figures;
 use colour::{write_cyan, write_gray, write_green, write_red, write_yellow};
 use std::io::Write;
 
+/// Input display style (default, password, or invisible).
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum InputStyle {
     Default,
@@ -11,6 +12,7 @@ pub enum InputStyle {
     Invisible,
 }
 
+/// Transforms input for display according to style (e.g. mask password).
 pub struct StyleTransform {
     pub scale: usize,
 }
@@ -25,6 +27,7 @@ impl StyleTransform {
     }
 }
 
+/// Returns style transform and display scale for the given input style.
 pub fn render_style(style: InputStyle) -> (StyleTransform, usize) {
     let scale = match style {
         InputStyle::Password | InputStyle::Default => 1,
@@ -33,7 +36,7 @@ pub fn render_style(style: InputStyle) -> (StyleTransform, usize) {
     (StyleTransform { scale }, scale)
 }
 
-/// Prompt symbol: ?, ✔, or ✖.
+/// Returns prompt symbol: `?`, tick, or cross depending on state.
 pub fn symbol(done: bool, aborted: bool, exited: bool) -> String {
     let fig = Figures::default();
     let mut buf = Vec::with_capacity(16);
@@ -49,7 +52,7 @@ pub fn symbol(done: bool, aborted: bool, exited: bool) -> String {
     String::from_utf8_lossy(&buf).into_owned()
 }
 
-/// Delimiter between message and input.
+/// Returns delimiter between message and input (ellipsis when completing, pointer otherwise).
 pub fn delimiter(completing: bool) -> String {
     let fig = Figures::default();
     let d = if completing {

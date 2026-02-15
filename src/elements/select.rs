@@ -16,6 +16,7 @@ pub struct Choice {
 }
 
 impl Choice {
+    /// Builds a choice with the given title and value; description and disabled are defaulted.
     pub fn new(title: impl Into<String>, value: impl Into<String>) -> Self {
         Self {
             title: title.into(),
@@ -218,7 +219,7 @@ fn run_select_interactive<R: BufRead, W: Write>(
     selected: &mut usize,
     n_lines: usize,
 ) -> io::Result<()> {
-    // In raw mode, \n alone doesn't move to column 0; use \r\n so each line starts at column 0.
+    // In raw mode, \n alone does not move to column 0; use \r\n so each line starts at column 0.
     const NL: &str = "\r\n";
 
     fn write_choices(
@@ -279,8 +280,8 @@ fn run_select_interactive<R: BufRead, W: Write>(
                     _ => {}
                 }
             }
-            // EraseLines erases current line then moves up; we're on the "Answer" line,
-            // so erase upward to clear the whole block. Cursor ends at top line, col 0.
+            // EraseLines erases the current line then moves up. We are on the "Answer" line,
+            // so erase upward to clear the whole block. Cursor ends at top line, column 0.
             let up = n_lines as u16;
             write!(stdout, "{}", EraseLines(up))?;
             write!(stdout, "{} {} {}{}", symbol, msg, delim, NL)?;

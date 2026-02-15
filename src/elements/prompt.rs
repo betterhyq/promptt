@@ -3,7 +3,7 @@
 use ansi_escapes::Beep;
 use std::io::{self, Write};
 
-/// Base prompt behavior (output, beep).
+/// Base prompt behavior: output helpers and bell (beep).
 pub struct Prompt;
 
 impl Prompt {

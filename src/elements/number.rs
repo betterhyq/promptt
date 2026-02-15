@@ -43,8 +43,8 @@ pub fn run_number<R: BufRead, W: Write>(
     let mut buf = Vec::with_capacity(opts.message.len() + 32);
     write_bold!(&mut buf, "{}", opts.message).ok();
     let msg = String::from_utf8_lossy(&buf).into_owned();
-    // Don't pre-display initial value: it's not editable (just printed text),
-    // so users couldn't delete or replace it. Use initial only when Enter with empty input.
+    // Do not pre-display initial value: it is not editable, so users could not change it.
+    // Use initial only when the user submits with empty input.
     let symbol = style::symbol(false, false, false);
     let delim = style::delimiter(false);
     write!(stdout, "{} {} {} ", symbol, msg, delim)?;
