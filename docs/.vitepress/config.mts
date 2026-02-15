@@ -1,28 +1,22 @@
 import { defineConfig } from 'vitepress'
 
-// https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "Promptt",
-  description: "A interactive CLI prompts library, lightweight and easy to use.",
+  title: 'Promptt',
+  description: 'A lightweight, interactive CLI prompts library for Rust.',
   themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: 'Getting Started', link: '/getting-started' },
+      { text: 'Prompt Types', link: '/prompt-types' },
+      { text: 'Examples', link: '/examples' },
     ],
-
     sidebar: [
-      {
-        text: 'Examples',
-        items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
-        ]
-      }
+      { text: 'Getting Started', link: '/getting-started' },
+      { text: 'Prompt Types', link: '/prompt-types' },
+      { text: 'Examples', link: '/examples' },
     ],
-
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
-    ]
-  }
+      { icon: 'github', link: 'https://github.com/betterhyq/promptt' },
+    ],
+  },
 })

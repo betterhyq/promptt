@@ -1,24 +1,30 @@
 # promptt
 
+<!-- automdrs:badges showCrateVersion="true" showCrateDownloads="true" showCrateDocs="true" showCommitActivity="true" showRepoStars="true" -->
 ![Crates.io Version](https://img.shields.io/crates/v/promptt)
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/promptt)
-![docs.rs](https://img.shields.io/docsrs/browser-paths)
+![docs.rs](https://img.shields.io/docsrs/promptt)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/betterhyq/promptt)
 ![GitHub Repo stars](https://img.shields.io/github/stars/betterhyq/promptt)
+<!-- /automdrs -->
 
-`promptt` is a lightweight, interactive CLI prompts library for Rust. It supports text, confirm, number, select, toggle, list, password, and invisible inputs—ideal for building terminal wizards, config generators, or any step-by-step CLI flow.
+Lightweight interactive CLI prompts for Rust: text, confirm, number, select, toggle, list, password, invisible.
 
-## Installation
+**[Full documentation →](https://betterhyq.github.io/promptt/)**
 
-Add this crate with Cargo:
+## Install
 
-```bash
+<!-- automdrs:cargo-add -->
+
+```sh
 cargo add promptt
 ```
 
+<!-- /automdrs -->
+
 ## Usage
 
-Define a list of `Question`s (each with a `name`, `type_name`, and `message`), then run them with `prompt()`. Answers are returned as a `HashMap<String, PromptValue>`.
+Build a list of `Question`s and run `prompt()`. Answers are `HashMap<String, PromptValue>`.
 
 ```rust
 use promptt::{prompt, Question, PromptValue};
@@ -41,8 +47,7 @@ fn main() -> io::Result<()> {
         },
     ];
 
-    let stdin = io::stdin();
-    let mut stdin = stdin.lock();
+    let mut stdin = io::stdin().lock();
     let mut stdout = io::stdout();
     let answers = prompt(&questions, &mut stdin, &mut stdout)?;
 
@@ -52,46 +57,40 @@ fn main() -> io::Result<()> {
     if let Some(PromptValue::Bool(yes)) = answers.get("confirm") {
         println!("You chose: {}", if *yes { "yes" } else { "no" });
     }
-
     Ok(())
 }
 ```
 
-### Supported prompt types
+## Prompt types
 
-| Type        | Result           | Notes                                      |
-|------------|------------------|--------------------------------------------|
-| `text`     | `PromptValue::String` | Single-line input                      |
-| `password` | `PromptValue::String` | Input hidden (masked)                   |
-| `invisible`| `PromptValue::String` | Input hidden (no echo)                 |
-| `number`   | `PromptValue::Float`  | Use `min`/`max`, `float`, `round` on `Question` |
-| `confirm`  | `PromptValue::Bool`   | Yes/No; set `initial_bool` for default  |
-| `toggle`   | `PromptValue::Bool`   | Use `active`/`inactive` for labels       |
-| `select`   | `PromptValue::String` | Single choice from `choices`            |
-| `list`     | `PromptValue::List`   | Multiple choices; use `separator` on `Question` |
+| Type        | Result              | Options / notes                    |
+|------------|---------------------|------------------------------------|
+| `text`     | `PromptValue::String` | `initial_text`                     |
+| `password` | `PromptValue::String` | Masked input                       |
+| `invisible`| `PromptValue::String` | No echo                            |
+| `number`   | `PromptValue::Float`  | `min`/`max`, `float`, `round`      |
+| `confirm`  | `PromptValue::Bool`   | `initial_bool`                     |
+| `toggle`   | `PromptValue::Bool`   | `active`/`inactive` labels         |
+| `select`   | `PromptValue::String` | `choices` (title/value)            |
+| `list`     | `PromptValue::List`   | `separator` (default `,`)          |
 
-## Contribution
-
-<details>
-  <summary>Local development</summary>
-
-- Clone this repository
-- Install the latest version of [Rust](https://rust-lang.org/)
-- Run tests using `cargo test` or `cargo run`
-
-</details>
-
-## Credits
-
-`promptt` has been inspired by several outstanding projects in the community:
-
-- [@prompts](https://github.com/terkelg/prompts) - Lightweight, beautiful and user-friendly interactive prompts
+More in the [documentation](https://betterhyq.github.io/promptt/) and [docs.rs](https://docs.rs/promptt).
 
 ## License
 
+<!-- automdrs:contributors author="YONGQI" license="MIT" -->
 Published under the [MIT](./LICENSE) license.
 Made by [@YONGQI](https://github.com/betterhyq) 💛
 <br><br>
 <a href="https://github.com/betterhyq/promptt/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=betterhyq/promptt" />
 </a>
+<!-- /automdrs -->
+
+<!-- automdrs:with-automdrs -->
+
+---
+
+_🛠️ auto updated with [automd-rs](https://github.com/betterhyq/automd-rs)_
+
+<!-- /automdrs -->

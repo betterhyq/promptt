@@ -1,25 +1,23 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
 hero:
-  name: "Promptt"
-  text: "A interactive CLI prompts library, lightweight and easy to use."
-  tagline: My great project tagline
+  name: Promptt
+  text: Interactive CLI prompts for Rust
+  tagline: Lightweight, easy to use — text, confirm, number, select, toggle, list, password, invisible
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Getting Started
+      link: /getting-started
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: Prompt Types
+      link: /prompt-types
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Simple API
+    details: Define questions with name, type, and message; run prompt() and get a HashMap of answers.
+  - title: Rich types
+    details: text, password, invisible, number, confirm, toggle, select, list — with optional defaults and validation.
+  - title: No heavy deps
+    details: Uses crossterm and ansi-escapes for terminal interaction; fits into any CLI workflow.
 ---
-
