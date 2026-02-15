@@ -143,4 +143,74 @@ mod tests {
         let r = prompt(&questions, &mut stdin, &mut stdout);
         assert!(r.is_err());
     }
+
+    #[test]
+    fn prompt_multiple_empty_type_names_skip_all() {
+        let questions = vec![
+            Question {
+                name: "a".into(),
+                type_name: String::new(),
+                message: "A?".into(),
+                ..Default::default()
+            },
+            Question {
+                name: "b".into(),
+                type_name: String::new(),
+                message: "B?".into(),
+                ..Default::default()
+            },
+        ];
+        let mut stdin = Cursor::new(b"");
+        let mut stdout = Vec::new();
+        let r = prompt(&questions, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert!(r.unwrap().is_empty());
+    }
+
+    #[test]
+    fn prompt_answer_keys_match_question_names() {
+        let questions = vec![
+            Question {
+                name: "first".into(),
+                type_name: "text".into(),
+                message: "First?".into(),
+                ..Default::default()
+            },
+            Question {
+                name: "second".into(),
+                type_name: "text".into(),
+                message: "Second?".into(),
+                ..Default::default()
+            },
+        ];
+        let mut stdin = Cursor::new(b"one\ntwo\n");
+        let mut stdout = Vec::new();
+        let r = prompt(&questions, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        let answers = r.unwrap();
+        assert_eq!(answers.get("first"), Some(&PromptValue::String("one".into())));
+        assert_eq!(answers.get("second"), Some(&PromptValue::String("two".into())));
+    }
+
+    #[test]
+    fn prompt_first_question_invalid_type_returns_err_immediately() {
+        let questions = vec![
+            Question {
+                name: "x".into(),
+                type_name: "bad".into(),
+                message: "X?".into(),
+                ..Default::default()
+            },
+            Question {
+                name: "y".into(),
+                type_name: "text".into(),
+                message: "Y?".into(),
+                ..Default::default()
+            },
+        ];
+        let mut stdin = Cursor::new(b"ignored\n");
+        let mut stdout = Vec::new();
+        let r = prompt(&questions, &mut stdin, &mut stdout);
+        assert!(r.is_err());
+    }
 }

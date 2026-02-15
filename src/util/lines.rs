@@ -54,4 +54,39 @@ mod tests {
     fn lines_count_strips_ansi() {
         assert_eq!(lines_count("\x1b[31mred\x1b[0m", 80), 1);
     }
+
+    #[test]
+    fn lines_count_single_newline_zero_width_line() {
+        assert_eq!(lines_count("\n", 80), 0);
+    }
+
+    #[test]
+    fn lines_count_newline_separated_lines() {
+        assert_eq!(lines_count("a\nb\nc", 1), 3);
+    }
+
+    #[test]
+    fn lines_count_per_line_one() {
+        assert_eq!(lines_count("abc", 1), 3);
+    }
+
+    #[test]
+    fn lines_count_boundary_exact_multiple() {
+        assert_eq!(lines_count("abcdef", 3), 2);
+    }
+
+    #[test]
+    fn lines_count_boundary_one_over() {
+        assert_eq!(lines_count("abcdefg", 3), 3);
+    }
+
+    #[test]
+    fn lines_count_unicode_chars_count_not_bytes() {
+        assert_eq!(lines_count("中文", 1), 2);
+    }
+
+    #[test]
+    fn lines_count_unicode_with_ansi() {
+        assert_eq!(lines_count("\x1b[31m中\x1b[0m文", 1), 2);
+    }
 }

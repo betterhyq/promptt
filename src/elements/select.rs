@@ -498,10 +498,10 @@ mod tests {
 
     #[test]
     fn next_enabled_skips_disabled() {
-        let mut a = Choice::new("A", "a");
+        let a = Choice::new("A", "a");
         let mut b = Choice::new("B", "b");
         b.disabled = true;
-        let mut c = Choice::new("C", "c");
+        let c = Choice::new("C", "c");
         let choices = vec![a, b, c];
         assert_eq!(next_enabled(&choices, 0), 2);
         assert_eq!(next_enabled(&choices, 2), 2);
@@ -509,10 +509,10 @@ mod tests {
 
     #[test]
     fn prev_enabled_skips_disabled() {
-        let mut a = Choice::new("A", "a");
+        let a = Choice::new("A", "a");
         let mut b = Choice::new("B", "b");
         b.disabled = true;
-        let mut c = Choice::new("C", "c");
+        let c = Choice::new("C", "c");
         let choices = vec![a, b, c];
         assert_eq!(prev_enabled(&choices, 2), 0);
         assert_eq!(prev_enabled(&choices, 0), 0);
@@ -529,5 +529,49 @@ mod tests {
     fn read_byte_eof_returns_err() {
         let mut r = Cursor::new(b"");
         assert!(read_byte(&mut r).is_err());
+    }
+
+    #[test]
+    fn run_select_empty_choices_returns_err() {
+        let opts = SelectPromptOptions {
+            message: "Pick".into(),
+            choices: vec![],
+            initial: None,
+            hint: None,
+        };
+        let mut stdin = Cursor::new(b"1\n");
+        let mut stdout = Vec::new();
+        let r = run_select(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_err());
+    }
+
+    #[test]
+    fn run_select_single_choice_accepts_one_or_title() {
+        let opts = SelectPromptOptions {
+            message: "Pick".into(),
+            choices: vec![Choice::new("Only", "only")],
+            initial: None,
+            hint: None,
+        };
+        let mut stdin = Cursor::new(b"1\n");
+        let mut stdout = Vec::new();
+        let r = run_select(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "only");
+    }
+
+    #[test]
+    fn run_select_initial_out_of_bounds_falls_back_to_zero() {
+        let opts = SelectPromptOptions {
+            message: "Pick".into(),
+            choices: vec![Choice::new("A", "a"), Choice::new("B", "b")],
+            initial: Some(99),
+            hint: None,
+        };
+        let mut stdin = Cursor::new(b"1\n");
+        let mut stdout = Vec::new();
+        let r = run_select(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "a");
     }
 }

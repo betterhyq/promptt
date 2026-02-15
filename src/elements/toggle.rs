@@ -139,4 +139,43 @@ mod tests {
         let mut stdout = Vec::new();
         assert_eq!(run_toggle(&opts, &mut stdin, &mut stdout).unwrap(), true);
     }
+
+    #[test]
+    fn run_toggle_no_turns_off() {
+        let opts = TogglePromptOptions {
+            message: "Enable?".into(),
+            initial: true,
+            active: "on".into(),
+            inactive: "off".into(),
+        };
+        let mut stdin = Cursor::new(b"no\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_toggle(&opts, &mut stdin, &mut stdout).unwrap(), false);
+    }
+
+    #[test]
+    fn run_toggle_unknown_input_returns_false() {
+        let opts = TogglePromptOptions {
+            message: "?".into(),
+            initial: true,
+            active: "on".into(),
+            inactive: "off".into(),
+        };
+        let mut stdin = Cursor::new(b"maybe\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_toggle(&opts, &mut stdin, &mut stdout).unwrap(), false);
+    }
+
+    #[test]
+    fn run_toggle_unknown_input_with_initial_false_returns_false() {
+        let opts = TogglePromptOptions {
+            message: "?".into(),
+            initial: false,
+            active: "on".into(),
+            inactive: "off".into(),
+        };
+        let mut stdin = Cursor::new(b"maybe\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_toggle(&opts, &mut stdin, &mut stdout).unwrap(), false);
+    }
 }

@@ -137,4 +137,51 @@ mod tests {
         let out = String::from_utf8(stdout).unwrap();
         assert!(out.contains("*****"));
     }
+
+    #[test]
+    fn run_text_empty_input_no_initial_returns_empty_string() {
+        let opts = TextPromptOptions {
+            message: "Name?".into(),
+            initial: None,
+            style: InputStyle::Default,
+            error_msg: None,
+        };
+        let mut stdin = Cursor::new(b"\n");
+        let mut stdout = Vec::new();
+        let r = run_text(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "");
+    }
+
+    #[test]
+    fn run_text_invisible_style_returns_value_but_hides_in_output() {
+        let opts = TextPromptOptions {
+            message: "Hidden?".into(),
+            initial: None,
+            style: InputStyle::Invisible,
+            error_msg: None,
+        };
+        let mut stdin = Cursor::new(b"secret\n");
+        let mut stdout = Vec::new();
+        let r = run_text(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "secret");
+        let out = String::from_utf8(stdout).unwrap();
+        assert!(!out.contains("secret"));
+    }
+
+    #[test]
+    fn run_text_whitespace_only_treated_as_empty_uses_initial() {
+        let opts = TextPromptOptions {
+            message: "X?".into(),
+            initial: Some("default".into()),
+            style: InputStyle::Default,
+            error_msg: None,
+        };
+        let mut stdin = Cursor::new(b"   \n");
+        let mut stdout = Vec::new();
+        let r = run_text(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), "default");
+    }
 }

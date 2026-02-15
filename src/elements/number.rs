@@ -219,4 +219,64 @@ mod tests {
         assert!(r.is_err());
         assert_eq!(r.unwrap_err().to_string(), "invalid number");
     }
+
+    #[test]
+    fn run_number_float_rounding() {
+        let opts = NumberPromptOptions {
+            message: "V?".into(),
+            float: true,
+            round: 2,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"2.345\n");
+        let mut stdout = Vec::new();
+        let r = run_number(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        let v = r.unwrap();
+        assert!((v - 2.35).abs() < 0.001);
+    }
+
+    #[test]
+    fn run_number_negative_integer() {
+        let opts = NumberPromptOptions {
+            message: "N?".into(),
+            float: false,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"-42\n");
+        let mut stdout = Vec::new();
+        let r = run_number(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), -42.0);
+    }
+
+    #[test]
+    fn run_number_negative_float_clamped_by_min() {
+        let opts = NumberPromptOptions {
+            message: "N?".into(),
+            float: true,
+            min: Some(0.0),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"-5.0\n");
+        let mut stdout = Vec::new();
+        let r = run_number(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert_eq!(r.unwrap(), 0.0);
+    }
+
+    #[test]
+    fn run_number_round_zero_integer_display() {
+        let opts = NumberPromptOptions {
+            message: "N?".into(),
+            float: true,
+            round: 0,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"3.7\n");
+        let mut stdout = Vec::new();
+        let r = run_number(&opts, &mut stdin, &mut stdout);
+        assert!(r.is_ok());
+        assert!((r.unwrap() - 4.0).abs() < 0.001);
+    }
 }

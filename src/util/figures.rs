@@ -88,4 +88,24 @@ mod tests {
         assert_eq!(a.tick, b.tick);
         assert_eq!(a.cross, b.cross);
     }
+
+    #[test]
+    fn figures_tick_not_equal_cross() {
+        let f = Figures::new();
+        assert_ne!(f.tick, f.cross);
+    }
+
+    #[test]
+    fn figures_radio_on_off_differ() {
+        let f = Figures::new();
+        assert_ne!(f.radio_on, f.radio_off);
+    }
+
+    #[test]
+    fn figures_clone_equals_original() {
+        let a = Figures::new();
+        let b = a.clone();
+        assert_eq!(a.tick, b.tick);
+        assert_eq!(a.pointer, b.pointer);
+    }
 }

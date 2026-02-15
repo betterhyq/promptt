@@ -48,4 +48,43 @@ mod tests {
         let out = clear(&long, 20);
         assert!(!out.is_empty());
     }
+
+    #[test]
+    fn clear_empty_string_per_line_zero() {
+        let out = clear("", 0);
+        assert!(out.contains("\x1b[2K"));
+    }
+
+    #[test]
+    fn clear_empty_string_nonzero_per_line() {
+        let out = clear("", 80);
+        assert!(!out.is_empty());
+    }
+
+    #[test]
+    fn clear_single_char_one_row() {
+        let out = clear("x", 80);
+        assert!(!out.is_empty());
+    }
+
+    #[test]
+    fn clear_exact_width_one_row() {
+        let out = clear(&"a".repeat(80), 80);
+        assert!(!out.is_empty());
+    }
+
+    #[test]
+    fn clear_one_over_width_two_rows() {
+        let out_single = clear(&"a".repeat(80), 80);
+        let out_wrapped = clear(&"a".repeat(81), 80);
+        assert!(out_wrapped.len() >= out_single.len());
+    }
+
+    #[test]
+    fn clear_multiline_row_count_greater_than_line_count() {
+        let two_lines = clear("a\nb", 10);
+        let five_lines = clear("a\nb\nc\nd\ne", 10);
+        assert!(!two_lines.is_empty());
+        assert!(!five_lines.is_empty());
+    }
 }

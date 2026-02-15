@@ -150,4 +150,51 @@ mod tests {
         let out = String::from_utf8(stdout).unwrap();
         assert!(out.contains("confirmed"));
     }
+
+    #[test]
+    fn run_confirm_no_returns_false() {
+        let opts = ConfirmPromptOptions {
+            message: "Ok?".into(),
+            initial: true,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"no\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_confirm(&opts, &mut stdin, &mut stdout).unwrap(), false);
+    }
+
+    #[test]
+    fn run_confirm_n_returns_false() {
+        let opts = ConfirmPromptOptions {
+            message: "Ok?".into(),
+            initial: true,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"n\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_confirm(&opts, &mut stdin, &mut stdout).unwrap(), false);
+    }
+
+    #[test]
+    fn run_confirm_empty_with_initial_false_returns_false() {
+        let opts = ConfirmPromptOptions {
+            message: "?".into(),
+            initial: false,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_confirm(&opts, &mut stdin, &mut stdout).unwrap(), false);
+    }
+
+    #[test]
+    fn run_confirm_uppercase_yes_accepted() {
+        let opts = ConfirmPromptOptions {
+            message: "?".into(),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"YES\n");
+        let mut stdout = Vec::new();
+        assert_eq!(run_confirm(&opts, &mut stdin, &mut stdout).unwrap(), true);
+    }
 }

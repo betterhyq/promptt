@@ -361,4 +361,34 @@ mod tests {
     fn ctrl_other_char_none() {
         assert_eq!(key_action(&key_ctrl('z'), false), None);
     }
+
+    #[test]
+    fn key_name_unknown_returns_none() {
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Unknown,
+                    ctrl: false,
+                    meta: false,
+                },
+                false,
+            ),
+            None,
+        );
+    }
+
+    #[test]
+    fn abort_key_returns_abort_action() {
+        assert_eq!(
+            key_action(
+                &Key {
+                    name: KeyName::Abort,
+                    ctrl: false,
+                    meta: false,
+                },
+                false,
+            ),
+            Some(PromptAction::Abort),
+        );
+    }
 }

@@ -5,7 +5,7 @@ use crate::util::style::InputStyle;
 use std::io::{self, BufRead, Write};
 
 /// Result value of a single prompt (string, bool, float, or list).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum PromptValue {
     String(String),
     Bool(bool),
@@ -394,5 +394,78 @@ mod tests {
         let mut stdout = Vec::new();
         let out = run_prompt(&q, &mut stdin, &mut stdout);
         assert!(out.is_err());
+    }
+
+    #[test]
+    fn run_prompt_list_default_separator_comma() {
+        let q = Question {
+            name: "tags".into(),
+            type_name: "list".into(),
+            message: "Tags?".into(),
+            separator: None,
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"a,b,c\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(
+            out.unwrap(),
+            Some(PromptValue::List(l)) if l == ["a", "b", "c"]
+        ));
+    }
+
+    #[test]
+    fn run_prompt_list_custom_separator() {
+        let q = Question {
+            name: "items".into(),
+            type_name: "list".into(),
+            message: "Items?".into(),
+            separator: Some(";".into()),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"x;y;z\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(
+            out.unwrap(),
+            Some(PromptValue::List(l)) if l == ["x", "y", "z"]
+        ));
+    }
+
+    #[test]
+    fn run_prompt_number_with_min_max_clamps() {
+        let q = Question {
+            name: "n".into(),
+            type_name: "number".into(),
+            message: "N?".into(),
+            min: Some(1.0),
+            max: Some(10.0),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"100\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(out.unwrap(), Some(PromptValue::Float(x)) if x == 10.0));
+    }
+
+    #[test]
+    fn run_prompt_toggle_uses_active_inactive_from_question() {
+        let q = Question {
+            name: "t".into(),
+            type_name: "toggle".into(),
+            message: "On?".into(),
+            initial_bool: Some(false),
+            active: Some("yes".into()),
+            inactive: Some("no".into()),
+            ..Default::default()
+        };
+        let mut stdin = Cursor::new(b"y\n");
+        let mut stdout = Vec::new();
+        let out = run_prompt(&q, &mut stdin, &mut stdout);
+        assert!(out.is_ok());
+        assert!(matches!(out.unwrap(), Some(PromptValue::Bool(true))));
     }
 }

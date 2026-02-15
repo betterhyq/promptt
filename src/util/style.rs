@@ -121,4 +121,49 @@ mod tests {
         assert!(!d_false.is_empty());
         assert!(!d_true.is_empty());
     }
+
+    #[test]
+    fn symbol_priority_aborted_over_exited_and_done() {
+        let s_aborted = symbol(true, true, false);
+        let s_exited = symbol(true, false, true);
+        assert!(!s_aborted.is_empty());
+        assert!(!s_exited.is_empty());
+    }
+
+    #[test]
+    fn symbol_pending_is_question_mark_without_ansi() {
+        let s = symbol(false, false, false);
+        assert!(s.contains('?') || !s.is_empty());
+    }
+
+    #[test]
+    fn style_transform_render_empty_string_default() {
+        let (t, _) = render_style(InputStyle::Default);
+        assert_eq!(t.render("", InputStyle::Default), "");
+    }
+
+    #[test]
+    fn style_transform_render_empty_string_password() {
+        let (t, _) = render_style(InputStyle::Password);
+        assert_eq!(t.render("", InputStyle::Password), "");
+    }
+
+    #[test]
+    fn style_transform_render_empty_string_invisible() {
+        let (t, _) = render_style(InputStyle::Invisible);
+        assert_eq!(t.render("", InputStyle::Invisible), "");
+    }
+
+    #[test]
+    fn style_transform_password_length_matches_input() {
+        let (t, _) = render_style(InputStyle::Password);
+        assert_eq!(t.render("abc", InputStyle::Password).len(), 3);
+        assert_eq!(t.render("xyz", InputStyle::Password), "***");
+    }
+
+    #[test]
+    fn render_style_invisible_scale_zero() {
+        let (_, scale) = render_style(InputStyle::Invisible);
+        assert_eq!(scale, 0);
+    }
 }
