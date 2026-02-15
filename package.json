@@ -5,7 +5,10 @@
     "format": "cargo fmt",
     "test": "cargo test -- --show-output",
     "test:coverage": "cargo tarpaulin",
-    "start": "node scripts/packageName.mjs"
+    "start": "node scripts/packageName.mjs",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "simple-git-hooks": {
     "pre-push": "pnpm format"
