@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  base: '/promptt/',
   title: 'Promptt',
   description: 'A lightweight, interactive CLI prompts library for Rust.',
   themeConfig: {
